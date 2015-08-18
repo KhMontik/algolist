@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0089)file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/extended_euclid_algorithm.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>MAXimal :: algo :: Расширенный алгоритм Евклида</title><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Расширенный алгоритм Евклида_files/style.css" tppabs="http://e-maxx.ru/data/style.css"><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Расширенный алгоритм Евклида_files/geshi.css" tppabs="http://e-maxx.ru/geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--></head><body><table class="main" cellpadding="0" cellspacing="0"><tbody><tr><td class="title" colspan="2"><p>MAXimal</p></td></tr><tr><td class="menu"><ul><li><a href="javascript:if(confirm('http://e-maxx.ru/index.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/index.php'" tppabs="http://e-maxx.ru/index.php">home</a></li><li><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/index.htm" tppabs="http://e-maxx.ru/algo/" class="current">algo</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/wiki/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/wiki/'" tppabs="http://e-maxx.ru/wiki/">wiki</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/bookz/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/bookz/'" tppabs="http://e-maxx.ru/bookz/">bookz</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/forum/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/forum/'" tppabs="http://e-maxx.ru/forum/">forum</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/about.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/about.php'" tppabs="http://e-maxx.ru/about.php">about</a></li></ul></td><td class="content"><p class="algoinfo">прочитано: 7931 раз<br>добавлено: 10 Jun 2008 17:58<br>редактировано: 26 Apr 2010 10:30</p><h1>Расширенный алгоритм Евклида</h1>
+<p>В то время как <a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/euclid_algorithm.htm" tppabs="http://e-maxx.ru/algo/euclid_algorithm">"обычный" алгоритм Евклида</a> находит наибольший общий делитель двух чисел A и B, расширенный алгоритм Евклида находит помимо НОД также коэффициенты X и Y такие, что:</p>
+<pre>A X + B Y = GCD(A,B)</pre>
+<h2>Реализация</h2>
+<pre>int gcd (int a, int b, int &amp; x, int &amp; y)
+{
+	if (a == 0)
+	{
+		x = 0; y = 1;
+		return b;
+	}
+	int x1, y1;
+	int d = gcd (b%a, a, x1, y1);
+	x = y1 - (b / a) * x1;
+	y = x1;
+	return d;
+}</pre>
+<h2>Асимптотика</h2>
+<p>Асимптотика работы, очевидно, такая же, как и у обычного алгоритма Евклида - O (log max(A,B)); более подробно см. <a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/euclid_algorithm.htm" tppabs="http://e-maxx.ru/algo/euclid_algorithm">"алгоритм Евклида"</a>.</p></td></tr></tbody></table><table width="100%"><tbody><tr><td><p style="text-align:center;"><img src="./MAXimal    algo    Расширенный алгоритм Евклида_files/valid-html401-blue.png" tppabs="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height="31" width="88"><img src="./MAXimal    algo    Расширенный алгоритм Евклида_files/valid-css2-blue.png" tppabs="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height="31" width="88"></p></td></tr></tbody></table></body></html>

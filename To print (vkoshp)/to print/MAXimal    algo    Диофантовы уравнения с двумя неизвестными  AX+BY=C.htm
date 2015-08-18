@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0082)file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/diofant_2_equation.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>MAXimal :: algo :: Диофантовы уравнения с двумя неизвестными: AX+BY=C</title><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Диофантовы уравнения с двумя неизвестными  AX+BY=C_files/style.css" tppabs="http://e-maxx.ru/data/style.css"><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Диофантовы уравнения с двумя неизвестными  AX+BY=C_files/geshi.css" tppabs="http://e-maxx.ru/geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--></head><body><table class="main" cellpadding="0" cellspacing="0"><tbody><tr><td class="title" colspan="2"><p>MAXimal</p></td></tr><tr><td class="menu"><ul><li><a href="javascript:if(confirm('http://e-maxx.ru/index.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/index.php'" tppabs="http://e-maxx.ru/index.php">home</a></li><li><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/index.htm" tppabs="http://e-maxx.ru/algo/" class="current">algo</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/wiki/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/wiki/'" tppabs="http://e-maxx.ru/wiki/">wiki</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/bookz/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/bookz/'" tppabs="http://e-maxx.ru/bookz/">bookz</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/forum/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/forum/'" tppabs="http://e-maxx.ru/forum/">forum</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/about.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/about.php'" tppabs="http://e-maxx.ru/about.php">about</a></li></ul></td><td class="content"><p class="algoinfo">прочитано: 4799 раз<br>добавлено: 10 Jun 2008 18:15<br>редактировано: 11 Jul 2008 10:35</p><h1>Диофантовы уравнения с двумя неизвестными: AX+BY=C</h1>
+<p>Диофантово уравнение с двумя неизвестными имеет вид:</p>
+<pre>A X + B Y = C</pre>
+<p>где A, B, C - заданные целые числа, X и Y - неизвестные целые числа.</p>
+<p>Ниже рассматриваются несколько классических задач на эти уравнения: нахождение любого решения, получение всех решений, нахождение количества решений и сами решения в определённом отрезке, нахождение решения с наименьшей суммой неизвестных.</p>
+<h2>1. Нахождение одного решения</h2>
+<p>Найти одно из решений диофантова уравнения с двумя неизвестными можно с помощью <b><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/extended_euclid_algorithm.htm" tppabs="http://e-maxx.ru/algo/extended_euclid_algorithm">Расширенного алгоритма Евклида</a></b>.</p>
+<p>Расширенный алгоритм Евклида по заданным A и B находит их наибольший общий делитель G, а также такие коэффициенты X<sub>g</sub>, Y<sub>g</sub>, что:</p>
+<pre>A X<sub>g</sub> + B Y<sub>g</sub> = G</pre>
+<p>Если C делится на G = gcd(A,B), то диофантово уравнение A X + B Y = C <b>имеет решение</b>; в противном случае диофантово уравнение <b>решений не имеет</b>.</p>
+<p>Предположим, что C делится на G, тогда, очевидно, выполняется:</p>
+<pre>A X<sub>g</sub> (C/G) + B Y<sub>g</sub> (C/G) = C</pre>
+<p>т.е. <b>одним из решений</b> диофантова уравнения являются числа:</p>
+<pre>X<sub>0</sub> = X<sub>g</sub> C / G
+Y<sub>0</sub> = Y<sub>g</sub> C / G</pre>
+<h2>2. Получение всех решений</h2>
+<p>Покажем, как получить все остальные решения (а их бесконечное множество) диофантова уравнения, зная одно из решений (X<sub>0</sub>, Y<sub>0</sub>).</p>
+<p>Итак, пусть G = gcd(A,B), а числа X<sub>0</sub>, Y<sub>0</sub> удовлетворяют условию:</p>
+<pre>A X<sub>0</sub> + B Y<sub>0</sub> = C</pre>
+<p>Тогда заметим, что, прибавив к X<sub>0</sub> число B/G и одновременно отняв A/G от Y<sub>0</sub>, мы не нарушим равенства:</p>
+<pre>A (X<sub>0</sub> + B/G) + B (Y<sub>0</sub> - A/G) =
+   = A X<sub>0</sub> + A B / G + B Y<sub>0</sub> - B A / G =
+   = A X<sub>0</sub> + B Y<sub>0</sub> =
+   = C</pre>
+<p>Очевидно, что этот процесс можно повторять сколько угодно, т.е. <b>все числа</b> вида:</p>
+<pre>X = X<sub>0</sub> + K B/G,
+Y = Y<sub>0</sub> - K A/G,
+K &#8712; Z</pre>
+<p>являются <b>решениями</b> диофантова уравнения.</p>
+<p>Более того, <b>только</b> числа такого вида и являются решениями, т.е. мы описали множество всех решений диофантова уравнения (оно получилось бесконечным, если не наложено дополнительных условий).</p>
+<h2>3. Нахождение количества решений и сами решения в заданном отрезке</h2>
+<p>Пусть даны два отрезка [X<sub>1</sub>;X<sub>2</sub>] и [Y<sub>1</sub>;Y<sub>2</sub>], и требуется найти количество решений (X,Y) диофантова уравнения, лежащих в данных отрезках соответственно.</p>
+<p>Сначала найдём <b>решение с наименьшим X = MinX</b> таким, что <b>MinX &#8712; [X<sub>1</sub>;X<sub>2</sub>]</b>. Для этого сначала найдём любое решение диофантова уравнения (см. пункт 1). Затем получим из него решение с наименьшим MinX &#8712; [X<sub>1</sub>;X<sub>2</sub>] - воспользуемся процедурой, описанной в пункте 2, и будем уменьшать/увеличивать MinX, пока оно не попадёт в заданный отрезок, и при этом будет наименьшим. Это можно сделать за O (1) таким образом:</p>
+<pre>int
+	a, b, c, g, // коэффициенты диофантова уравнения, и g=gcd(a,b)
+	x0, y0, // одно из решений диофантова уравнения
+	x1, x2, // заданный отрезок
+	mx, my; // искомое решение с наименьшим x &gt;= x1
+int cnt = (x1 - x0) / b;
+if (x0 + cnt * b &lt; x1)
+	++cnt;
+mx = x0 + cnt * b;
+my = y0 - cnt * b;</pre>
+<p>Здесь предполагается, что B &gt; 0 (если B &lt; 0, то нужно предварительно изменить знаки A, B и C).</p>
+<p>Аналогичным образом найдём решение <b>с наибольшим X = MaxX &#8712; [X<sub>1</sub>;X<sub>2</sub>]</b>.</p>
+<p>Теперь, если MinX &gt; MaxX, то количество решений равно нулю.</p>
+<p>Если же MinX &lt;= MaxX, то нам осталось <b>наложить условие на Y</b>: Y &#8712; [Y<sub>1</sub>;Y<sub>2</sub>].</p>
+<p>Пусть MinY и MaxY - это соответствующие пары для MinX и MaxX. Если MinY &gt; MaxY, то обменяем их значения. Нам нужно найти пересечение отрезка [MinY;MaxY] и [Y<sub>1</sub>;Y<sub>2</sub>]. Будем увеличивать MinY (на |A/G|), пока оно не станет больше либо равно Y<sub>1</sub>, и будем уменьшать MaxY (опять же, на |A/G|), пока оно не станет меньше либо равно Y<sub>2</sub> (выполняя это, мы не нарушим ограничения на X, поскольку уменьшая MinY, мы только увеличиваем соответствующий ему MinX, аналогично и для MaxY).</p>
+<p>В конце концов <b>ответом</b> на задачу будет являться величина (MaxY - MinY) / |A/G|.</p>
+<p>Таким образом, мы можем найти количество решений в заданном отрезке за <b>O (log max(A,B))</b>.</p>
+<p>Аналогичным образом можно получить и сами решения, лежащие в заданном отрезке.</p>
+<h2>4. Нахождение решения в заданном отрезке с наименьшей суммой X+Y</h2>
+<p>Здесь на X и на Y также должны быть наложены какие-либо ограничения, иначе ответом практически всегда будет минус бесконечность.</p>
+<p>Но идея решения такая же, как в предыдущем пункте: сначала находим любое решение диофантова уравнения, затем, применяя описанную в пункте 2 процедуру, придём к наилучшему решению.</p>
+<p>Действительно, мы имеем право выполнить следующее преобразование (см. пункт 2):</p>
+<pre>X += K B/G,
+Y -= K A/G,
+K &#8712; Z</pre>
+<p>Заметим, что при этом сумма X+Y меняется следующим образом:</p>
+<pre>(X + K B/G) + (Y - K A/G) =
+   = X + Y + K (B/G - A/G)</pre>
+<p>Т.е. если A &lt; B, то нужно выбрать как можно меньшее значение K, если A &gt; B, то нужно выбрать как можно большее значение K.</p>
+<p>Если A = B, то мы никак не сможем улучшить решение, все решения будут обладать одной и той же суммой.</p>
+<p>Таким образом, мы решили эту задачу за асимптотику <b>O (log max(A,B))</b>.</p></td></tr></tbody></table><table width="100%"><tbody><tr><td><p style="text-align:center;"><img src="./MAXimal    algo    Диофантовы уравнения с двумя неизвестными  AX+BY=C_files/valid-html401-blue.png" tppabs="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height="31" width="88"><img src="./MAXimal    algo    Диофантовы уравнения с двумя неизвестными  AX+BY=C_files/valid-css2-blue.png" tppabs="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height="31" width="88"></p></td></tr></tbody></table></body></html>

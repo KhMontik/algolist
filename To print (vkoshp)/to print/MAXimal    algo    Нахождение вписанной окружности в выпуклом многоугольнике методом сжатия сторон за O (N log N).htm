@@ -1,0 +1,131 @@
+
+<!-- saved from url=(0080)file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/inscribed_circle.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"></head><body>1f6d
+<title>MAXimal :: algo :: Нахождение вписанной окружности в выпуклом многоугольнике методом сжатия сторон за O (N log N)</title><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Нахождение вписанной окружности в выпуклом многоугольнике методом сжатия сторон за O (N log N)_files/style.css" tppabs="http://e-maxx.ru/data/style.css"><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Нахождение вписанной окружности в выпуклом многоугольнике методом сжатия сторон за O (N log N)_files/geshi.css" tppabs="http://e-maxx.ru/geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--><table class="main" cellpadding="0" cellspacing="0"><tbody><tr><td class="title" colspan="2"><p>MAXimal</p></td></tr><tr><td class="menu"><ul><li><a href="javascript:if(confirm('http://e-maxx.ru/index.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/index.php'" tppabs="http://e-maxx.ru/index.php">home</a></li><li><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/index.htm" tppabs="http://e-maxx.ru/algo/" class="current">algo</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/wiki/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/wiki/'" tppabs="http://e-maxx.ru/wiki/">wiki</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/bookz/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/bookz/'" tppabs="http://e-maxx.ru/bookz/">bookz</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/forum/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/forum/'" tppabs="http://e-maxx.ru/forum/">forum</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/about.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/about.php'" tppabs="http://e-maxx.ru/about.php">about</a></li></ul></td><td class="content"><p class="algoinfo">прочитано: 1399 раз<br>добавлено: 11 Jun 2008 10:34<br>редактировано: 13 Jul 2008 14:39</p><h1>Нахождение вписанной окружности в выпуклом многоугольнике методом "сжатия сторон"</h1>
+
+<p>Дан выпуклый многоугольник с N вершинами. Требуется найти координаты центра и радиус наибольшей вписанной окружности.</p>
+<p>В отличие от описанного <a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/inscribed_circle_ternary.htm" tppabs="http://e-maxx.ru/algo/inscribed_circle_ternary">здесь</a> метода тернарного поиска, при данном методе решения время работы - <b>O (N log N)</b> - не зависит от ограничений на координаты и от точности, и поэтому этот метод проходит при значительно больших N.</p>
+<p>Спасибо <b><a href="javascript:if(confirm('http://acm.uva.es/board/memberlist.php?mode=viewprofile&u=4424  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://acm.uva.es/board/memberlist.php?mode=viewprofile&u=4424'" tppabs="http://acm.uva.es/board/memberlist.php?mode=viewprofile&amp;u=4424">mf</a></b> за описание этого красивого алгоритма.</p>
+<h2>Алгоритм</h2>
+<p>Итак, дан выпуклый многоугольник. Начнём одновременно и с одинаковой скоростью <b>сдвигать</b> все его стороны параллельно самим себе внутрь многоугольника:</p>
+<p></p><center><img src="./MAXimal    algo    Нахождение вписанной окружности в выпуклом многоугольнике методом сжатия сторон за O (N log N)_files/inscribed_circle_shrinking.jpg" tppabs="http://e-maxx.ru/algo/inscribed_circle_shrinking.jpg"></center><p></p>
+<p>Пусть, для удобства, это движение происходит со скоростью 1 координатная единица в секунду (т.е. время в данном случае - это расстояние от сторон до их новых положений).</p>
+<p>Ясно, что в процессе этого движения стороны многоугольника будут постепенно исчезать (обращаться в точки). Наконец, заметим, что время, через которое весь многоугольник сожмётся в точку или отрезок, и будет являться ответом на задачу (искомым радиусом; центр искомой окружности будет лежать на этой точке (или отрезке)).</p>
+<p>Научимся эффективно моделировать этот процесс. Для этого научимся для каждой стороны <b>определять время</b>, через которое она сожмётся в точку в результате движения её соседей.</p>
+<p>Для этого рассмотрим внимательно процесс движения сторон. Заметим, что вершины многоугольника всегда двигаются по биссектрисам углов (это следует из равенства соответствующих треугольников). Но тогда вопрос о времени, через которое сторона сожмётся, сводится к вопросу об определении высоты треугольника, в котором известна одна сторона A и два прилежащих к ней угла &#945; и &#946;. Воспользовавшись, например, теоремой синусов, получаем формулу:</p>
+<pre>H = A sin(&#945;) sin(&#946;) / sin(&#945;+&#946;)</pre>
+<p>Теперь мы умеем за O(1) определять время, через которое сторона сожмётся в точку.</p>
+<p>Занесём эти времена для каждой стороны в некую <b>структуру данных для извлечения минимума</b>, например, set (доступ к произвольному элементу нам также понадобится, см. ниже).</p>
+<p>Будем <b>извлекать</b> по одной стороне с наименьшим временем. Каждую извлечённую сторону надо <b>удалить</b> из многоугольника, это выражается в том, что соседи этой стороны становятся соседями друг друга, т.е. для них надо пересчитать значение времени, также увеличатся их длины (эти стороны надо продлить до их пересечения). Таким образом, для каждой стороны надо будет завести указатели на её соседей. Если в какой-то момент у удаляемой стороны соседи параллельны, то на этом процесс удаления сторон надо остановить, и ответом будет время исчезновения текущей стороны (это ясно из смысла самого алгоритма - мы удаляем текущую вершину, т.е. её соседи сдвигаются друг к другу, но если они параллельны, то они совпадут, и больше сдвигать стороны мы не сможет). Также мы останавливаем процесс, если остаётся только две стороны, и ответом будет время исчезновения последней удалённой стороны (опять же, если остаётся только две стороны, то получается, что весь многоугольник сжался до отрезка, и ответом будет время, за которое мы достигли этого состояния, т.е. время сжатия последней удалённой стороны).</p>
+<p>Очевидно, асимптотика этого метода <b>O (N log N)</b>, поскольку алгоритм состоит из O (N) шагов, на каждом из которых на операции со структурой данных затрачивается O (log N), и O (1) на все остальные операции.</p>
+<p>Из вычислительной геометрии нам потребуется только нахождение угла между двумя сторонами, пересечение двух прямых и проверка двух прямых на параллельность.</p>
+<h2>Реализация</h2>
+<p>Программа, которая выводит радиус вписанной окружности:</p>
+<pre>const double EPS = 1E-9;
+const double INF = 1E+40;
+
+struct pt {
+	double x, y;
+	pt()  { }
+	pt (double x, double y) : x(x), y(y)  { }
+};
+
+double get_ang (pt &amp; a, pt &amp; b) {
+	double ang1 = atan2 (a.y, a.x);
+	double ang2 = atan2 (b.y, b.x);
+	double ang = abs (ang1 - ang2);
+	return min (ang, 2*M_PI-ang);
+}
+
+pt vec (pt &amp; a, pt &amp; b) {
+	return pt (b.x-a.x, b.y-a.y);
+}
+
+double dist (pt &amp; a, pt &amp; b) {
+	return sqrt ((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y));
+}
+
+double get_h (double a, double alpha, double beta) {
+	return a * sin(alpha) * sin(beta) / sin(alpha+beta);
+}
+
+double det (double a, double b, double c, double d) {
+	return a * d - b * c;
+}
+
+pt intersect_line (pt &amp; p1, pt &amp; p2, pt &amp; q1, pt &amp; q2) {
+	double a1 = p1.y - p2.y;
+	double b1 = p2.x - p1.x;
+	double c1 = - a1 * p1.x - b1 * p1.y;
+	double a2 = q1.y - q2.y;
+	double b2 = q2.x - q1.x;
+	double c2 = - a2 * q1.x - b2 * q1.y;
+	return pt (
+		- det (c1, b1, c2, b2) / det (a1, b1, a2, b2),
+		- det (a1, c1, a2, c2) / det (a1, b1, a2, b2)
+		);
+}
+
+bool parallel (pt &amp; p1, pt &amp; p2, pt &amp; q1, pt &amp; q2) {
+	double a1 = p1.y - p2.y;
+	double b1 = p2.x - p1.x;
+	double a2 = q1.y - q2.y;
+	double b2 = q2.x - q1.x;
+	return abs (det (a1, b1, a2, b2)) &lt; EPS;
+}
+
+double calc_val (pt &amp; p1, pt &amp; p2, pt &amp; q1, pt &amp; q2, pt &amp; r1, pt &amp; r2) {
+	pt l1 = intersect_line (p1, p2, q1, q2);
+	pt l2 = intersect_line (p1, p2, r1, r2);
+	return get_h (dist (l1, l2), get_ang(vec(q1,q2),vec(p1,p2))/2,
+		get_ang(vec(r1,r2),vec(p2,p1))/2);
+}
+
+int main() {
+
+	int n;
+	vector&lt;pt&gt; a (n);
+	... чтение n и a ...
+
+	set &lt; pair&lt;double,int&gt; &gt; q;
+	vector&lt;double&gt; val (n);
+	for (int i=0; i&lt;n; ++i) {
+		pt &amp; p1 = a[i],  &amp; p2 = a[(i+1)%n],  &amp; q1 = a[(i-1+n)%n],  &amp; q2 = a[(i+2)%n];
+		val[i] = calc_val (p1, p2, p1, q1, p2, q2);
+		q.insert (make_pair (val[i], i));
+	}
+
+	vector&lt;int&gt; next (n), prev (n);
+	for (int i=0; i&lt;n; ++i) {
+		next[i] = (i + 1) % n;
+		prev[i] = (i - 1 + n) % n;
+	}
+
+	double last_time;
+	while (q.size() &gt; 2) {
+		last_time = q.begin()-&gt;first;
+		int id = q.begin()-&gt;second;
+		q.erase (q.begin());
+		val[id] = -1;
+
+		next[prev[id]] = next[id];
+		prev[next[id]] = prev[id];
+		int nxt = next[id],  prv = prev[id];
+		if (parallel (a[nxt], a[(nxt+1)%n], a[prv], a[(prv+1)%n]))
+			break;
+		q.erase (make_pair (val[nxt], nxt));
+		q.erase (make_pair (val[prv], prv));
+		val[nxt] = calc_val (a[nxt], a[(nxt+1)%n], a[(prv+1)%n],
+			a[prv], a[next[nxt]], a[(next[nxt]+1)%n]);
+		val[prv] = calc_val (a[prv], a[(prv+1)%n], a[(prev[prv]+1)%n],
+			a[prev[prv]], a[nxt], a[(nxt+1)%n]);
+		q.insert (make_pair (val[nxt], nxt));
+		q.insert (make_pair (val[prv], prv));
+	}
+
+	printf ("%.9lf", last_time);
+	
+}</pre></td></tr></tbody></table><table width="100%"><tbody><tr><td><p style="text-align:center;"><img src="./MAXimal    algo    Нахождение вписанной окружности в выпуклом многоугольнике методом сжатия сторон за O (N log N)_files/valid-html401-blue.png" tppabs="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height="31" width="88"><img src="./MAXimal    algo    Нахождение вписанной окружности в выпуклом многоугольнике методом сжатия сторон за O (N log N)_files/valid-css2-blue.png" tppabs="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height="31" width="88"></p></td></tr></tbody></table>
+0
+
+</body></html>

@@ -1,0 +1,142 @@
+Graph Theory:
+- Floyd				-
+- BFS				-
+- Dijkstra                      
+  - Simple			-
+  - Heap			-
+- Bellman                       
+  - Find negative cycle         -
+  - Find min distance		-
+- Kuhn Maximal Matching         -
+- DFS
+  - Strong Components           -
+  - Bridges                     -
+  - Cut Points                  -
+  - Find cycle                  -
+- 2-SAT algorithm		-
+- Euler tour/cycle		-
+- Hamiltom cycle		-
+- Kruskal                       -
+- Prim                          
+  - Simple			-
+  - Heap			-
+- MaxFlow
+  - Edmonson Karp O(VE^2)	-
+  - Dinic O(V^2E)		-
+  - PreFlow O(N^4)		-
+  - PreFlow O(N^3)		-
+  - "Zooming" O(E^2logMaxF)	-
+  - "Zooming"Dinic O(VElogMaxF)	-
+- MinCostMaxFlow		
+  - Ford Bellman		-
+  - Dijkstra with potencials	-
+  - Deleting negative cycles 	- 
+- LCA 				
+  - O(nlogn), O(logn)	BinLift	-
+  - O(n),     O(logn)	RMQ	-
+  - O(n), O(1)			-
+  - O(n) offline with DSU	-
+- Minimal Chain on DAG		-
+- Inverse SSSP (Inverse MinPath)-
+- Inverse MST 			-
+
+
+Geometry:
+- Area of Triangle                              -
+- Checking intersection of 2 segments           -
+- Finding Ax+By+C of line                       -
+- Finding point of intersection of 2 segments   -
+- Finding point of intersection of 2 lines      -
+- Area of convex polygon                        -
+- Intersection of circle and line               -
+- Intersection of 2 circles                     -
+- Convex Hull (NlogN)                           -
+- Checking point in polygon (N)                 -
+- Checking point in polygon (logN)		-
+- Finding 2 nearest points (NlogN)		-
+- Pick's Theorem				-
+
+
+Strings:
+- Z-function 		 	-
+- Prefix-Function               -
+- Rabin-Karp Algo 		-
+- Suffix-array 			
+  - O(N^2) Digital sort		-
+  - O(NlogN) 			-
+  - O(Nlog^2N)	Hashes		-
+- Suffix-automation		-
+- Suffix-Tree			
+  - T = O(N^2), M = O(N^2)	-
+  - T = O(N^2), M = O(N)	-
+  - Ukkonen Algorithm O(N)	-
+- Finding all palindroms 	-
+- Aho-Corasik                   -
+- Hash-Tables
+  - Open Adressing		-
+  - ...				-
+- Longest Common Prefix		-
+  - Suffix-array and O(N, logN) -
+  - Hashes O(logN)		-
+
+Data Structure:
+- Fenwick Tree                   
+  - Simple			-
+  - 2D			 	-
+  - 3D				-
+  - Segment update		-
+- DSU                           -
+- Segments tree                 
+  - Min,Max,Sum,Lcm,gcd (i..j)  -
+  - Segment update from top	-
+  - Segment update from bottom	-
+  - 2D from bottom		-
+  - 2D from top, table update   -
+- Treap, decart 		
+  - Kth Max/Min			-
+  - Treap on unknown keys	-
+- Stack+Stack = Queue           -
+- Heap                          -
+- Scanline			-
+- Quadro Tree			-
+- Bor				-
+
+Game Theory:
+- Nim Game			-
+- Game Graph			-
+- Game DP			-
+- Grandi Function		-
+
+Combinatorics:
+- Binomial coefficients                
+  - O(NK,1) Pascal's Triangle	  	-
+  - O(1,N+K) By formula			-
+- Catalan Numbers		       	-
+- Finding next right brackets sequence 	-
+- Finding k-th right brackets sequence 	-
+
+Others:
+- Fibonacci N	
+  - O(N) DP			-
+  - O(logN) Matrix		-
+- Prime Numbers
+  - O(N*sqrt(N),1)		-
+  - O(NlnlnN,1)			-
+  - O(1,logN) Ferma theorem	-
+- GCD
+  - Simple			-
+  - Extended			-
+- BinPow (A^B%C) O(logB)	-
+- Matrix powering 		-
+- Inverse element by modulo	
+  - With GCD			-
+  - With BinPow			-
+- Euler Function		-
+- Fast Fur'e ...		-
+- Longest Increasing Subsequence
+  - O(N^2)			-
+  - O(NlogN)			-
+- Longest Common Subsequence	-	
+- Gauss Method 			-
+- Binary search			-
+- Ternary search		-

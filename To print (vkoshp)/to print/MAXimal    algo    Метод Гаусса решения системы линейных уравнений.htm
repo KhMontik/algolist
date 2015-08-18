@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0084)file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/linear_systems_gauss.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>MAXimal :: algo :: Метод Гаусса решения системы линейных уравнений</title><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Метод Гаусса решения системы линейных уравнений_files/style.css" tppabs="http://e-maxx.ru/data/style.css"><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Метод Гаусса решения системы линейных уравнений_files/geshi.css" tppabs="http://e-maxx.ru/geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--></head><body><table class="main" cellpadding="0" cellspacing="0"><tbody><tr><td class="title" colspan="2"><p>MAXimal</p></td></tr><tr><td class="menu"><ul><li><a href="javascript:if(confirm('http://e-maxx.ru/index.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/index.php'" tppabs="http://e-maxx.ru/index.php">home</a></li><li><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/index.htm" tppabs="http://e-maxx.ru/algo/" class="current">algo</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/wiki/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/wiki/'" tppabs="http://e-maxx.ru/wiki/">wiki</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/bookz/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/bookz/'" tppabs="http://e-maxx.ru/bookz/">bookz</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/forum/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/forum/'" tppabs="http://e-maxx.ru/forum/">forum</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/about.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/about.php'" tppabs="http://e-maxx.ru/about.php">about</a></li></ul></td><td class="content"><p class="algoinfo">прочитано: 3737 раз<br>добавлено: 11 Jun 2008 11:11<br>редактировано: 7 Sep 2008 22:50</p><h1>Метод Гаусса решения системы линейных уравнений</h1>
+
+<p>Дана система из N линейных уравнений с N неизвестными. Известно, что система имеет единственное решение (т.е. определитель её отличен от нуля). Требуется найти это решение.</p>
+<h2>Описание метода</h2>
+<p>Дана система:</p>
+<pre>a<sub>11</sub> x<sub>1</sub> + a<sub>12</sub> x<sub>2</sub> + ... + a<sub>1n</sub> x<sub>n</sub> = b<sub>1</sub>
+a<sub>21</sub> x<sub>1</sub> + a<sub>22</sub> x<sub>2</sub> + ... + a<sub>2n</sub> x<sub>n</sub> = b<sub>2</sub>
+...
+a<sub>n1</sub> x<sub>1</sub> + a<sub>n2</sub> x<sub>2</sub> + ... + a<sub>nn</sub> x<sub>n</sub> = b<sub>n</sub></pre>
+<p>Выполним следующий алгоритм.</p>
+<p>На первом шаге найдём в первом столбце наибольший по модулю элемент, поставим уравнение с этим элементом на первую строчку (обменяв две соответствующие строки матрицы A и два соответствующих элемента вектора B), а затем будем отнимать это уравнение от всех остальных, чтобы в первом столбце все элементы (кроме первого) обратились в ноль. Например, при прибавлении ко второй строке будем домножать первую строку на -a<sub>21</sub>/a<sub>11</sub>, при добавлении к третьей - на -a<sub>31</sub>/a<sub>11</sub>, и т.д.</p>
+<p>На втором шаге найдём во втором столбце, начиная со второго элемента, наибольший по модулю элемент, поставим уравнение с этим элементом на вторую строчку, и будем отнимать это уравнение от всех остальных (в том числе и от первого), чтобы во втором столбце все элементы (кроме второго) обратились в ноль. Понятно, что эта операция никак не изменит первый столбец - ведь от каждой строки мы будем отнимать вторую строку, домноженную на некоторый коэффициент, а во второй строке в первом столбце стоит ноль.</p>
+<p>Т.е. на i-ом шаге найдём в i-ом столбце, начиная с i-го элемента, наибольший по модулю элемент, поставим уравнение с этим элементом на i-ю строчку, и будем отнимать это уравнение от всех остальных. Понятно, что это никак не повлияет на все предыдущие столбцы (с первого по (i-1)-ый).</p>
+<p>В конце концов, мы приведём систему к так называемому диагональному виду:</p>
+<pre>c<sub>11</sub> x<sub>1</sub> = d<sub>1</sub>
+c<sub>22</sub> x<sub>2</sub> = d<sub>2</sub>
+...
+c<sub>nn</sub> x<sub>n</sub> = d<sub>n</sub></pre>
+<p>Т.е. мы нашли решение системы.</p>
+<p>Замечание 1. На каждой итерации найдётся хотя бы один ненулевой элемент, иначе система бы имела нулевой определитель, что противоречит условию.</p>
+<p>Замечание 2. Требование, что на каждом шаге мы выбираем наибольший по модулю элемент, очень важно в смысле численной устойчивости метода. Если выбирать произвольный ненулевой элемент, то это может привести к гигантской погрешности, когда получившееся решение будет отличаться в разы от правильного.</p>
+<h2>Реализация</h2>
+<p>Для упрощения реализации матрица коэффициентов A и столбец свободных коэффициентов B будем хранить в одном векторе a.</p>
+<pre>const double EPS = 1E-9;
+int n;
+vector &lt; vector&lt;double&gt; &gt; a (n, vector&lt;double&gt; (n+1));
+... чтение n и a ...
+
+for (int i=0; i&lt;n; ++i) {
+	int k = i;
+	for (int j=i+1; j&lt;n; ++j)
+		if (abs (a[j][i]) &gt; abs (a[k][i]))
+			k = j;
+	swap (a[i], a[k]);
+	for (int j=i+1; j&lt;=n; ++j)
+		a[i][j] /= a[i][i];
+	for (int j=0; j&lt;n; ++j)
+		if (j != i)
+			for (int k=i+1; k&lt;=n; ++k)
+				a[j][k] -= a[i][k] * a[j][i];
+}
+
+for (int i=0; i&lt;n; ++i)
+	printf ("%.15lf\n", a[i][n]);</pre>
+<h2>Применения</h2>
+<p>Помимо непосредственно решения систем, метод Гаусса находит применение и в других задачах:</p>
+<ul>
+<li><b><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/determinant_gauss.htm" tppabs="http://e-maxx.ru/algo/determinant_gauss">Нахождение определителя матрицы</a></b></li>
+<li><b><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/matrix_rank.htm" tppabs="http://e-maxx.ru/algo/matrix_rank">Нахождение ранга матрицы</a></b></li>
+</ul></td></tr></tbody></table><table width="100%"><tbody><tr><td><p style="text-align:center;"><img src="./MAXimal    algo    Метод Гаусса решения системы линейных уравнений_files/valid-html401-blue.png" tppabs="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height="31" width="88"><img src="./MAXimal    algo    Метод Гаусса решения системы линейных уравнений_files/valid-css2-blue.png" tppabs="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height="31" width="88"></p></td></tr></tbody></table></body></html>

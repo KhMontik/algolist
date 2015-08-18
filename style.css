@@ -1,0 +1,55 @@
+ul {
+  list-style-type: none;
+}
+
+li {
+  font-size: 22px;
+  position: relative;
+}
+li a {
+  text-decoration: none;
+  color: black;
+  text-align: center;
+}
+body {
+  background-color:#ddffdd;
+  height: 150%;
+}
+h2 a {
+  color: green;
+  text-decoration: none;
+}
+h2 {
+  font-family: cursive;
+  text-align: center;
+  color: green;
+}
+h1 {
+  font-family: cursive;
+  text-align: center;
+  color: green;
+}
+div {
+  height: 380px;
+  width: 380px;
+  border: 2px solid black;
+  border-radius: 60px;
+  display: inline-block;
+  position: relative;
+  left: 0px;
+  top: 20px;
+  float: left;
+  margin-left: 20px;
+  margin-top: 20px;
+}
+#ds {
+
+}
+#graph {
+}
+#geom {
+}
+#string {
+}
+#other {
+}

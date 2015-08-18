@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0079)file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/segment_to_line.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>MAXimal :: algo :: Нахождение уравнения прямой для отрезка</title><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Нахождение уравнения прямой для отрезка_files/style.css" tppabs="http://e-maxx.ru/data/style.css"><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Нахождение уравнения прямой для отрезка_files/geshi.css" tppabs="http://e-maxx.ru/geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--></head><body><table class="main" cellpadding="0" cellspacing="0"><tbody><tr><td class="title" colspan="2"><p>MAXimal</p></td></tr><tr><td class="menu"><ul><li><a href="javascript:if(confirm('http://e-maxx.ru/index.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/index.php'" tppabs="http://e-maxx.ru/index.php">home</a></li><li><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/index.htm" tppabs="http://e-maxx.ru/algo/" class="current">algo</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/wiki/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/wiki/'" tppabs="http://e-maxx.ru/wiki/">wiki</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/bookz/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/bookz/'" tppabs="http://e-maxx.ru/bookz/">bookz</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/forum/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/forum/'" tppabs="http://e-maxx.ru/forum/">forum</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/about.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/about.php'" tppabs="http://e-maxx.ru/about.php">about</a></li></ul></td><td class="content"><p class="algoinfo">прочитано: 2962 раз<br>добавлено: 11 Jun 2008 10:14<br>редактировано: 11 Jun 2008 10:18</p><h1>Нахождение уравнения прямой для отрезка</h1>
+
+<p>Уравнение прямой имеет вид A x + B y + C = 0. Найдём значения коэффициентов A, B, C для любого заданного отрезка.</p>
+<p>&nbsp;</p>
+<p>Понятно, что, вообще говоря, таких наборов значений существует бесконечное множество.</p>
+<h2>Способ 1</h2>
+<p>Мы устраним неоднозначность таким образом: коэффициент B, если отличен от нуля, должен быть равен единице; если же коэффициент B равен нулю (вертикальная прямая), что тогда A должно быть равно единице.</p>
+<p>Вот готовые формулы для не вертикальных прямых (их легко получить, если представить уравнение прямой в виде y = K x + B):</p>
+<pre>A = - (Y1 - Y2) / (X1 - X2),
+B = 1,
+C = - (A * X1) - (B * Y1)</pre>
+<p>Для вертикальных прямых имеем:</p>
+<pre>A = 1,
+B = 0,
+C = - X1</pre>
+<p>Реализация:</p>
+<pre>struct segment {
+	double x1, y1, x2, y2;
+};
+
+struct line {
+	double a, b, c;
+};
+
+const double EPS = 1e-6;
+
+bool eq (double a, double b)
+{
+	return fabs (a-b) &lt; EPS;
+}
+
+void segment_to_line (const segment &amp; s, line &amp; l)
+{
+	if (eq (s.x1, s.x2))
+	{
+		l.a = 1;
+		l.b = 0;
+		l.c = - s.x1;
+	}
+	else
+	{
+		l.a = - (s.y1 - s.y2) / (s.x1 - s.x2);
+		l.b = 1;
+		l.c = - (l.a * s.x1 + l.b * s.y1);
+	}
+}</pre>
+<h2>Способ 2</h2>
+<p>По-другому избежать неоднозначности можно следующим образом:</p>
+<pre>A = Y1 - Y2
+B = X2 - X1
+C = - (A X1 + B Y1)</pre>
+<p>В корректности этих формул можно убедиться непосредственной подстановкой.</p>
+<p>Способ 2 обычно лучше способа 1 в том смысле, что если все координаты целочисленные, то и коэффициенты в уравнении прямой также получатся целочисленными.</p></td></tr></tbody></table><table width="100%"><tbody><tr><td><p style="text-align:center;"><img src="./MAXimal    algo    Нахождение уравнения прямой для отрезка_files/valid-html401-blue.png" tppabs="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height="31" width="88"><img src="./MAXimal    algo    Нахождение уравнения прямой для отрезка_files/valid-css2-blue.png" tppabs="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height="31" width="88"></p></td></tr></tbody></table></body></html>

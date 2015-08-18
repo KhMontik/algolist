@@ -1,0 +1,417 @@
+Content-Type: multipart/related; start=<op.mhtml.1290260663805.72c9d81e273f9cdb@192.168.0.232>; boundary=----------feiLO7DUokJknts9ZKEwvf
+Content-Location: http://e-maxx.ru/algo/cutpoints
+Subject: =?utf-8?Q?MAXimal=20::=20algo=20::=20=D0=9F=D0=BE=D0=B8=D1=81=D0=BA=20=D1=82=D0=BE=D1=87=D0=B5=D0=BA=20=D1=81=D0=BE=D1=87=D0=BB=D0=B5=D0=BD=D0=B5=D0=BD=D0=B8=D1=8F?=
+MIME-Version: 1.0
+
+------------feiLO7DUokJknts9ZKEwvf
+Content-Disposition: inline; filename=cutpoints.htm
+Content-Type: text/html; charset=windows-1251; name=cutpoints.htm
+Content-ID: <op.mhtml.1290260663805.72c9d81e273f9cdb@192.168.0.232>
+Content-Location: http://e-maxx.ru/algo/cutpoints
+Content-Transfer-Encoding: 8bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><title>MAXimal :: algo :: Поиск точек сочленения</title><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><link rel="stylesheet" type="text/css" href="../data/style.css"><link rel="stylesheet" type="text/css" href="../geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--></head><body><table class=main cellpadding=0 cellspacing=0><tr><td class=title colspan=2><p>MAXimal</p></td></tr><tr><td class=menu><ul><li><a href="../index.php" >home</a></li><li><a href="../algo/" class=current>algo</a></li><li><a href="../wiki/" >wiki</a></li><li><a href="../bookz/" >bookz</a></li><li><a href="../forum/" >forum</a></li><li><a href="../about.php" >about</a></li></ul></td><td class=content><p class=algoinfo>прочитано: 5557 раз<br>добавлено: 5 Jul 2008 22:26<br>редактировано: 14 Oct 2008 20:13</p><h1>Точки сочленения</h1>
+<p>Пусть дан связный неориентированный граф. <b>Точкой сочленения</b> называется такая вершина графа, удаление которой делает граф несвязным. Граф, не имеющий точек сочленения, называется двусвязным.</p>
+<p>Опишем алгоритм, основанный на <a href="dfs">поиске в глубину</a>, позволяющий найти все точки сочленения в графе за время O (N+M).</p>
+<h2>Алгоритм</h2>
+<p>Запустим обход в глубину из произвольной вершины графа; обозначим её через root. Заметим два следующих факта (которые несложно доказать):</p>
+<ul>
+<li>Пусть v - вершина графа, v&ne;root. Тогда, если найдётся такой потомок t вершины v в дереве поиска, что ни из него, ни из какого-либо его потомка нет ребра (обратного) в предка вершины v, то вершина v будет являться точкой сочленения. В противном случае, вершина v не является точкой сочленения.</li>
+<li>Рассмотрим теперь корень root дерева поиска. Тогда он является точкой сочленения тогда и только тогда, когда он имеет как минимум двух потомков в дереве поиска.</li>
+</ul>
+<p>Теперь осталось научиться для каждой вершины эффективно проверять, не найдётся ли из её потомка обратное ребро в предка текущей вершины. Для этого воспользуемся временами входа поиска в глубину.</p>
+<p>Итак, пусть tin[v] - это время захода поиска в глубину в вершину v. Теперь введём массив fup[v], который и позволит нам отвечать на вышеописанные запросы. Время fup[v] равно минимуму из времени захода в саму вершину tin[v], времён захода в каждую из вершину p, являющуюся концом некоторого обратного ребра (v,p), а также из всех значений fup[to] для каждой вершины to, являющейся непосредственным сыном v в дереве поиска:</p>
+<pre>fup[v] = min {
+	tin[v],
+	tin[p], где (v,p) - обратное ребро,
+	fup[to], где (v,to) - ребро дерева
+}</pre>
+<p>Тогда, из вершины v или её потомка есть обратное ребро в её предка тогда и только тогда, когда найдётся такой сын to, что fup[to] &lt; tin[v].</p>
+<p>Таким образом, если для текущей вершины v&ne;root найдётся такой непосредственный сын to, что fup[to] >= tin[v], то вершина v является точкой сочленения; в противном случае она точкой сочленения не является.</p>
+<h2>Реализация</h2>
+<p>На выходе в векторе cutpoint для каждой вершины будет содержаться булево значение - является она точкой сочленения или нет.</p>
+<p>Если говорить о самой реализации, то здесь нужно уметь отличать случай, когда мы пытаемся идти в предка текущей вершины в дереве поиска в глубину. Такой проход не является проходом по обратному ребру, но тем не менее, в данном случае мы можем проигнорировать этот момент. Дело в том, что мы различаем два случая: когда в результате прохода по обратному ребру fup[to] &lt; tin[v], и, наоборот, когд fup[to] >= tin[v]. Отсюда можно заметить, что проход по ребру в предка только сделает fup[v] как максимум tin[p], но не меньше, а потому этот проход нам ничего не ухудшает. Таким образом, строку, которая отмечена комментарием в нижеприведённом коде, можно безо всяких последствий удалить (как и передачу предка p в функцию).</p>
+<pre>vector &lt; vector&lt;int> > g;
+vector&lt;char> used;
+vector&lt;char> cutpoint;
+int timer;
+vector&lt;int> tin, fup;
+
+void dfs (int v, int p = -1) {
+	used[v] = true;
+	tin[v] = fup[v] = timer++;
+	int children = 0;
+	for (size_t i=0; i&lt;g[v].size(); ++i) {
+		int to = g[v][i];
+		if (to == p)  continue; // эту строку можно удалить
+		if (used[to])
+			fup[v] = min (fup[v], tin[to]);
+		else {
+			++children;
+			dfs (to, v);
+			fup[v] = min (fup[v], fup[to]);
+			if (fup[to] >= tin[v])
+				cutpoint[v] = true;
+		}
+	}
+	if (p == -1)
+		cutpoint[v] = children > 1;
+}
+
+int main() {
+	int n;
+	... чтение n и g ...
+	
+	timer = 0;
+	used.assign (n, false);
+	cutpoint.assign (n, false);
+	tin.resize (n);
+	fup.resize (n);
+	dfs (0);
+}</pre></td></tr></table><table width="100%"><tr><td><p style="text-align:center;"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height=31 width=88><img src="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height=31 width=88></p></td></tr></table></body></html>
+------------feiLO7DUokJknts9ZKEwvf
+Content-Disposition: inline; filename=style.css
+Content-Type: text/css; charset=windows-1251; name=style.css
+Content-Location: http://e-maxx.ru/data/style.css
+Content-Transfer-Encoding: 8bit
+
+body
+{
+	margin: 0px;
+	padding: 10px;
+	background-color: #9999aa;
+}
+table.main
+{
+	width : 100%;
+	margin: 0px;
+	padding: 0px;
+	font: 14pt Arial;
+	color: #f2f2f2;
+	border: 2px solid #666666;
+	height: 100%;
+}
+.main td
+{
+	margin: 0px;
+	padding: 0px;
+}
+
+.main td.title, .title p
+{
+	background-color: #7777aa;
+	color: #ffffff;
+	margin-left: 100px;
+	font-size: 30px;
+	letter-spacing: 3px;
+	padding: 0px;
+	height: 1em;
+}
+
+.menu
+{
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	overflow: hidden;
+}
+.main td.menu
+{
+	margin: 0px;
+	padding: 10px;
+	width: 8%;
+	background-color: #ffffff;
+	vertical-align: top;
+	border-width: 0px;
+}
+.menu ul
+{
+	margin: 0px;
+	padding: 0px;
+	text-indent: 0px;
+}
+.menu li
+{
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	background-color: #ffffff;
+	letter-spacing: 1px;
+	list-style-type: none;
+}
+.menu a, .menu a:hover
+{
+	margin: 0px;
+	padding: 5px;
+	width: 90%;
+	display: block;
+	color: #000000;
+	text-decoration: none;
+	font-size: 10pt;
+	border-bottom: 1px #eeeeee solid;
+}
+.menu a:hover
+{
+	background-color: #d8cfff;
+}
+.menu a.current
+{
+	background-color: #ccccdd;
+}
+
+.main td.content, .content a
+{
+	font-size: 12pt;
+}
+.main td.content
+{
+	padding: 10px;
+	background-color: #ffffff;
+	color: #222222;
+	border-left: 2px dotted #dddddd;
+	vertical-align: top;
+}
+.content a, .content a:visited
+{
+	color: #4444aa;
+	text-decoration: none;
+}
+.content a:hover
+{
+	color: #4444aa;
+	text-decoration: underline;
+}
+.content hr
+{
+	width: 100%;
+	text-align: center;
+	color: #dddddd;
+	margin: 20px 0px;
+	padding: 0px;
+}
+h1, h2, h3, h4
+{
+	font-weight: bold;
+	text-align: left;
+	margin: 0px;
+	padding: 5px 0px;
+	color: #660000;
+}
+h1
+{
+	font-size: 21pt;
+}
+h2
+{
+	font-size: 18pt;
+}
+h3
+{
+	font-size: 15pt;
+}
+h4
+{
+	font-size: 13pt;
+}
+p
+{
+	margin: 10px 0px;
+	padding: 0px;
+}
+ul
+{
+	margin: 10px 0px;
+	padding: 0px 20px;
+}
+ul.catalog
+{
+	margin-top: 0px;
+}
+.catalog li
+{
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+pre
+{
+	background-color: #e9e9e9;
+	color: #000000;
+	padding: 5px 10px;
+}
+p.formula
+{
+	background-color: #e9e9e9;
+	color: #000000;
+	padding: 5px 10px;
+}
+.table1 {
+	margin: 10px 0px;
+	padding: 0px;
+	border: 1px solid #999999;
+	text-indent: 0px;
+}
+.table1 td, .table1 th {
+	margin: 0px;
+	padding: 5px;
+	border: 1px solid #999999;
+	text-align: center;
+}
+.table1 th {
+	text-align: center;
+	font-weight: bold;
+}
+.table2 {
+	margin: 10px 0px;
+	padding: 0px;
+	border: 1px solid #999999;
+	text-indent: 0px;
+	width: 100%;
+}
+.table2 td, .table2 th {
+	margin: 0px;
+	padding: 5px;
+	border: 1px solid #999999;
+	text-align: center;
+}
+.table2 th {
+	text-align: center;
+	font-weight: bold;
+}
+
+
+p.algoinfo {
+	text-align: right;
+	font-size: 9pt;
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+
+img.tex {
+	vertical-align: middle;
+	margin: 0px;
+	padding: 0px;
+}
+
+
+.link {
+	color: #4444aa;
+	text-decoration: none;
+	cursor: pointer;
+}
+.link :hover {
+	color: #4444aa;
+	text-decoration: underline;
+}
+
+------------feiLO7DUokJknts9ZKEwvf
+Content-Disposition: inline; filename=geshi.css
+Content-Type: text/css; charset=windows-1251; name=geshi.css
+Content-Location: http://e-maxx.ru/geshi/geshi.css
+Content-Transfer-Encoding: 8bit
+
+.cpp  {border: 1px dotted #a0a0a0; font-family: 'Courier New', Courier, monospace; background-color: #f0f0f0; color: #0000bb;}
+.cpp .de1, .cpp .de2 {font-weight:normal;background:transparent;color:#000; padding-left: 5px;}
+.cpp .kw1 {color: #a1a100;}
+.cpp .kw2 {color: #000; font-weight: bold;}
+.cpp .kw3 {color: #000066;}
+.cpp .kw4 {color: #f63333;}
+.cpp .co1, .cpp .co2, .cpp .coMULTI {color: #808080;}
+.cpp .es0 {color: #000033; font-weight: bold;}
+.cpp .br0 {color: #66cc66;}
+.cpp .st0 {color: #ff0000;}
+.cpp .nu0 {color: #ff33ff;}
+.cpp .me0 {color: #006600;}
+------------feiLO7DUokJknts9ZKEwvf
+Content-Disposition: inline; filename=valid-html401-blue.png
+Content-Type: image/png; name=valid-html401-blue.png
+Content-Location: http://www.w3.org/Icons/valid-html401-blue
+Content-Transfer-Encoding: Base64
+
+iVBORw0KGgoAAAANSUhEUgAAAFgAAAAfCAMAAABUFvrSAAABnlBMVEUAAAAKCwwN
+DxAOEBIRExQTFhgVGBoaHBwaHiEdISUjIyMhJiokKi0oKCgmLDAuNTozMzMxOT47
+Ozs1PUM9Rkw/SE8/SVBLS0xCTFNPT1BLV19UVFRcXFxEXW9NWWFQXGRZXmJWY2xZ
+ZnBda3VlZWVqa2tgbnhwcHB7e3sAWpwIX58fW4cJYJ8NYqERZaIVaKQaa6Yebagy
+bZkhb6klcqopdawxea85dKE1fLA4frJndoFoeIQ8gbNEhrZHiLdKirlVkb1alL9v
+gIxrg5dxgo50hpJ4ipZ6jZp+kZ52kaddlsBjmsJpnsRtocZ1pcl8qsyBg4WJjpaX
+l5eYmJiAk6GGmqiQl6CLoK+NorKZoaqQprWSqLeVrLyYr7+jpaarq620tLS/v7+C
+rs6GsM+FsNCJs9Gbs8Oft8iQt9SVutWYvNebvtihucqmv9GfwdqnwNKjw9upw9Wr
+xtmtydywy96yzeC20OPCwsLMzMzU1NTY2NjA1ufG2ujN3+zT4+7d6fLn5+fs7Ozi
+7PPp8fbu9Pj09PTy9/r1+Pv+/v7MzMwU1kEcAAAAinRSTlP/////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+/////////////////////////////////////wCETaj5AAAAAWJLR0QAiAUdSAAA
+AAlwSFlzAAAASAAAAEgARslrPgAAA+pJREFUSMetlo9TGkcUxx+VYtPSqQYdMFoy
+SWqSd1UYWrUqtaGt9mowmFRJGqD5oQNOKozI3m6NmqTxF9v/um/3fuLgOGTymHu3
+u8x+bu+777092Pvo9uw/ZbAnL7cji19igrmtp4/GegDzS0344BsfDSyCnQ9dsSOK
+9+acCV+G3sEWb5VrnNfLO6ykrc4rdPFWqcxEo1zvAPcmRRlinF8DswbakjwCUc5v
+AZTZL3DzAnAzU6DZ1amqgpwYRkZZTsrTh+Ov5Yu2BpcUOAkmKxajsFisWRGAJ9an
+BOYKLISrdVCKd5gm4gHOKXATbVuVMg4Q2h94TWDBynAlm/0KTCHEIFQIEAlHE79B
+DEp8EW6KC8JtGt+QT+Ex+fuYOz7axnRbPoMv714Nh94rsCjbEpiMMRe8BF/EkgTO
+qhV3Bxdwg/wMNsmn8Z2UU6o5cpVU+Oau0pixEgwyRhpzf8WtT6DogJnoHscHOEuz
+EUnXQ5wmuVVfhtVf7VPprHiIW6QxTR2Evwgf6ePzwywJFbYEw6ZZDKwY0YuKSVJh
+GzEl5SoW5PEkHtLW9ftRweyocMEVwVgkrKI5SZu3qDSK+uBvUZFtcI5ePYczKEiP
+A5lHY+VEtuM+WHBWo2Bt1Fo0tV5jtOKtLRUGDWrv1si8UH76nd57B9wkFSYyDAtH
+atW5NOJsW651ZF5H3lK+MRHs+e0fnKiywceY4pg/M6a38WfVP0whk/9cXCso6Jjo
+VjasBYfrZt4c6cDlAtqRIeUK5jszTwQXu9udSuZxXfAm4kSbogHxRPcZTnWCGTcB
+ahqcABja5df7YNB71tyr81wX/AbxnkpB/FE64Mx7u3V6qsBC7IRDGixMuH4b5nk2
+64GtWZysnuN6RSiDf+sUrMpX97UUP720yXdeKjATidiQDU5AnVHsiYYHVjxjw+N+
+3VHd8nikU/AttQonzRQ222P/0sg47Ks4FmaoPqzBVj8IHgkxH7xi8wr39M34tbMe
+8xnlD76X8iyNBqrU24uMjn0Oa1pjcSWWjcKtBukZg10einLmga059M1YPlfo2xv6
+RjVNvl1Jp/Nn1Ngf7R947mzeZyGVX7Xb18Q8/F6CG1zseFKwBZ9b7f3MY0rjaIhv
+URHuq1Biky056JzH7fFo0vW2tNziT9ZJXHOJEvjP9eX19brlBHRecyeqvR5NgbKo
+niGcs9kSwv3ieKC4m72f0n6qiUBtsITlja8amtvzYSqChcIFE9f/Rtrc/IDjn0j2
+2WNZtmeqDGk+Y/64GgiAX1xqzx+TPVLuD+0fO36ty/jDcVeK+Gg8PjIy4l2j8c67
++iXitiXiTjPog+MKNaDB/wOqezk60C6YdAAAAABJRU5ErkJggg==
+
+------------feiLO7DUokJknts9ZKEwvf
+Content-Disposition: inline; filename=valid-css2-blue.png
+Content-Type: image/png; name=valid-css2-blue.png
+Content-Location: http://www.w3.org/Icons/valid-css2-blue
+Content-Transfer-Encoding: Base64
+
+iVBORw0KGgoAAAANSUhEUgAAAFgAAAAfCAMAAABUFvrSAAADAFBMVEUAAQEHCAgK
+CwwNDxARExQTFhgWGRwaHB0dISQjIyMhJiojKSwoKCgmLDArMjYsMzgzMzMxOT47
+Ozs1PUI4QUc8RUs/SE9LS0xCTFNPT1BGUFhKVVxUVFRbW1tEXW9NWWFQXGRSX2hZ
+XmJVYmtYZW9ZZnBebHZfbXhlZWVqa2tgbnhicXxwcHB7e3sAWpwIX58fW4cJYJ8N
+YqERZaIVaKQaa6YebagybZkhb6klcqopdawxea85dKE1fLA4frJndoFsfIdufoo8
+gbNEhrZHiLdKirlVkb1alL9vgIxrg5dxgo51hpN4ipZ6jZp/kp92kad/k6BdlsBj
+msJpnsRtocZ1pcl8qsyBg4WJjpaXl5eYmJiAlKKEmKaGmqiJnqyQl6CLoK+NorGZ
+oaqQprWUq7ujpaarq620tLS/v7+Crs6GsM+FsNCJs9GbssOft8iQt9SVutWYvNeb
+vtihusumv9GfwdqnwdKjw9upw9Wpxtqsyd2wy96yzeC20OPCwsLMzMzU1NTA1ufG
+2ujN3+zT4+7d6fLn5+fs7Ozi7PPp8fbu9Pj09PTy9/r1+Pv+/v7MzMwAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEbvKuAAAA
+kHRSTlP/////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+/////wADZeeHAAAAAWJLR0T/pQfyxQAAAAlwSFlzAAAASAAAAEgARslrPgAABBhJ
+REFUSMetlotTWkcUxvcSMCS0iUYjELXMFE3q2ByqMLRqTZyY0DwwJTiY1FIDQvOw
+wKTSEdxHfSQ2vtj+yz1793K5KK3DNGd0d+9l7o/Dt985e8n2J4+1v1WQbXl+HFAh
+BGOCCW6GWgvGO8bai5EuwFyRkdsEC/s7OoDD3YAxSdHKmP07F8FfdgEWgiquQmqs
+umLs/0uBSrCtws9FnGguW1XQYqr8CaTABFMeQsiYSLpwWmWVHpzCZ6iiHVyLZ/Dp
+0nRJQY4ikbiKhJTHz8e35esGgpkou4yJcjYpvJ5iJVlmYZKq5lLnSbEPMSTuwh0F
+roGOZSn9hBg7vTumFBMkoPQQPiO8imYLk8HFLaZ1/w+NZ+A9jlE4xPEZJA4PNiB2
+In8ln92+5nF9VK4QQ2Te3LbVy4R4i6wyQMiFh053iE7gDLzFcRZqOMZgX8pptQxe
+QxW+uq3tNkGuI1h5oRgiQ7iozBs9ytxNMBUdNm8X5vBpANR1D2ZQbnUt3eqj42MN
+rrqM0eLTx2zoafkuuckmHhZzrivMIQWzwSMAtiumUIUNgKiUy5CRh1Owh8hLDrtx
+/stF9MEt5sPRV8HNI6QnJeyC0dbW4G9AkTU4gT89AbMgUI9dmYbI0pE89jvshhrS
+Sr6KZaJGRNXz5VaWCkut7rH2rbn3FriGKkzGKWQOVNaJGMBcQ644S1rXNP6ZXeNU
+sxC82aIE/d5ylQYfQpRD+iQyswE/qOu9KFD5Zxu4WchWdZ8ymtVKBF2wuM3Ku4M6
+cLkA2hlSLkG6vQm1ISxl61tnCs/mNsHrAJMNdAPAkXlNYdoB3nc8bHs35yHGlYK2
+2r13er5vc5vg9wAPVAnCPWmB4x/1SvkNM64UacsBnG/keDacG1PmRl3nYLKEPm7p
+4GhCcfjdLMGSfPfMlOL+G03++o0JHutv/lwz46Rbfccm8XFL18g65w809ou27paG
+A7MEP+Aqc1SLQq0x8hfeGTd2NLjvj7G++WyAJ0OFG4P5RTfmTQMki/wlExfJaB0i
+j9r7MZ9V4+53Up7EIAKq9LY9wyOXyE/SAt+6nDQKRuHzu96hsDfpZqI+QJ5ohaEV
+kz+eavSNt+aEPU1+WIrF0ie42Bnu6X1lnXmj/QFvKJQLDBibF/pDoSdusekzHler
+psYLNjdS6vbMG+3L9QSu5nNkUNz03riKGS9iVROXdkPC5tLujiYhqhVOCxXOy3XO
+6/mtellUUxhZq/7SWocSE91lTKldwGZ1CKrfLVplrXZwCrms24zPHPdmWTvuLkem
+flNF3V3GHY4g8/XFcZ+ur5stqtvj33qJoLQ1toIKrRVtB78+N169xHjx0hxX7PWK
+dad9fD7elMI/7PcHg0Gcgh1n9e/3B/x2BJrjdWvt+MyPj/Wa4H8AEjmMqk32ECkA
+AAAASUVORK5CYII=
+
+------------feiLO7DUokJknts9ZKEwvf--

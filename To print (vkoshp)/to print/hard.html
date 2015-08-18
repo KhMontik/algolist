@@ -1,0 +1,976 @@
+
+<span id="code">
+<span id="col6">#include&nbsp;&lt;iostream&gt;<br></span>
+<span id="col6">#include&nbsp;&lt;cmath&gt;<br></span>
+<span id="col6">#include&nbsp;&lt;list&gt;<br></span>
+<span id="col6">#include&nbsp;&lt;vector&gt;<br></span>
+<span id="col6">#include&nbsp;&lt;algorithm&gt;<br></span>
+<span id="col6">using</span>&nbsp;<span id="col6">namespace</span>&nbsp;std;<br>
+<br>
+<span id="col7">//&nbsp;Алгоритмы&nbsp;для&nbsp;работы&nbsp;с&nbsp;вычислительной&nbsp;геометрией<br></span>
+<br>
+<span id="col6">const</span>&nbsp;<span id="col6">double</span>&nbsp;eps&nbsp;=&nbsp;1e-8;<br>
+<span id="col6">const</span>&nbsp;<span id="col6">double</span>&nbsp;pi&nbsp;=&nbsp;3.14159265358979323;<br>
+<span id="col7">//&nbsp;наибольший&nbsp;общий&nbsp;делитель&nbsp;двух&nbsp;чисел<br></span>
+<span id="col6">long</span>&nbsp;<span id="col6">long</span>&nbsp;gcd&nbsp;(<span id="col6">long</span>&nbsp;<span id="col6">long</span>&nbsp;a,&nbsp;<span id="col6">long</span>&nbsp;<span id="col6">long</span>&nbsp;b)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;=&nbsp;(a&nbsp;&lt;&nbsp;0&nbsp;?&nbsp;-&nbsp;a&nbsp;:&nbsp;a);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;b&nbsp;=&nbsp;(b&nbsp;&lt;&nbsp;0&nbsp;?&nbsp;-&nbsp;b&nbsp;:&nbsp;b);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;(a&nbsp;&amp;&amp;&nbsp;b)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(a&nbsp;&gt;&nbsp;b)&nbsp;a&nbsp;%=&nbsp;b;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span>&nbsp;b&nbsp;%=&nbsp;a;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;a&nbsp;+&nbsp;b;<br>
+}<br>
+<br>
+<span id="col7">//***********************&nbsp;Структуры&nbsp;данных&nbsp;************************************<br></span>
+<span id="col7">//&nbsp;Точка<br></span>
+<span id="col6">class</span>&nbsp;point<br>
+{<br>
+<span id="col6">public</span>:&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;x,&nbsp;y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;дополнительный&nbsp;параметр&nbsp;-&nbsp;индекс&nbsp;точки<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Создание&nbsp;точки&nbsp;(_x,&nbsp;_y)<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;point(<span id="col6">double</span>&nbsp;_x,&nbsp;<span id="col6">double</span>&nbsp;_y)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;=&nbsp;_x;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;=&nbsp;_y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Создание&nbsp;точки&nbsp;(0,&nbsp;0)<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;point()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;point(0,&nbsp;0);&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+};<br>
+<br>
+<span id="col7">//&nbsp;Прямая<br></span>
+<span id="col6">class</span>&nbsp;line<br>
+{<br>
+<span id="col6">public</span>:&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;a,&nbsp;b,&nbsp;c;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Создание&nbsp;прямой&nbsp;ax&nbsp;+&nbsp;by&nbsp;+&nbsp;c&nbsp;=&nbsp;0<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;line(<span id="col6">double</span>&nbsp;_a&nbsp;=&nbsp;0,&nbsp;<span id="col6">double</span>&nbsp;_b&nbsp;=&nbsp;0,&nbsp;<span id="col6">double</span>&nbsp;_c&nbsp;=&nbsp;0)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;=&nbsp;_a;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b&nbsp;=&nbsp;_b;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;=&nbsp;_c;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+};<br>
+<span id="col6">class</span>&nbsp;circle<br>
+{<br>
+<span id="col6">public</span>:&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;c;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;r;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Дополнительные&nbsp;данные<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;alpha;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Создание&nbsp;окружности&nbsp;с&nbsp;центром&nbsp;(x,&nbsp;y)&nbsp;и&nbsp;радиусом&nbsp;_r<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;circle&nbsp;(<span id="col6">double</span>&nbsp;x,&nbsp;<span id="col6">double</span>&nbsp;y,&nbsp;<span id="col6">double</span>&nbsp;_r)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;=&nbsp;point(x,&nbsp;y);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;=&nbsp;_r;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Создание&nbsp;окружности&nbsp;с&nbsp;центром&nbsp;p&nbsp;и&nbsp;радиусом&nbsp;_r<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;circle&nbsp;(point&nbsp;p,&nbsp;<span id="col6">double</span>&nbsp;_r)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;=&nbsp;p;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;=&nbsp;_r;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;circle&nbsp;()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;circle(0,&nbsp;0,&nbsp;0);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+};<br>
+<span id="col7">//&nbsp;сравнение&nbsp;двух&nbsp;точек&nbsp;по&nbsp;принципу&nbsp;самая&nbsp;нижняя&nbsp;из&nbsp;самых&nbsp;левых<br></span>
+<span id="col6">class</span>&nbsp;less_of_posXY<br>
+{<br>
+<span id="col6">public</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">bool</span>&nbsp;operator&nbsp;()&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(a.x&nbsp;-&nbsp;b.x)&nbsp;&gt;&nbsp;eps)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;a.x&nbsp;&lt;&nbsp;b.x;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(a.y&nbsp;-&nbsp;b.y)&nbsp;&lt;=&nbsp;eps)&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;a.y&nbsp;&lt;&nbsp;b.y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+};<br>
+<span id="col7">//&nbsp;равенство&nbsp;двух&nbsp;точек<br></span>
+<span id="col6">class</span>&nbsp;equal_point&nbsp;<br>
+{<br>
+<span id="col6">public</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">bool</span>&nbsp;operator&nbsp;()&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;abs&nbsp;(a.x&nbsp;-&nbsp;b.x)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;abs&nbsp;(a.y&nbsp;-&nbsp;b.y)&nbsp;&lt;=&nbsp;eps;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+};<br>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//***********************&nbsp;Функции&nbsp;для&nbsp;работы&nbsp;с&nbsp;точками&nbsp;************************<br></span>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//&nbsp;расстояние&nbsp;между&nbsp;двумя&nbsp;точками<br></span>
+<span id="col6">double</span>&nbsp;dist(point&nbsp;a,&nbsp;point&nbsp;b)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;sqrt((a.x&nbsp;-&nbsp;b.x)&nbsp;*&nbsp;(a.x&nbsp;-&nbsp;b.x)&nbsp;+&nbsp;(a.y&nbsp;-&nbsp;b.y)&nbsp;*&nbsp;(a.y&nbsp;-&nbsp;b.y));<br>
+}<br>
+<span id="col7">//&nbsp;лежит&nbsp;ли&nbsp;точка&nbsp;в&nbsp;прямоугольнике,&nbsp;который&nbsp;образуют&nbsp;заданные&nbsp;точки<br></span>
+<span id="col6">bool</span>&nbsp;point_in_box&nbsp;(point&nbsp;t,&nbsp;point&nbsp;p1,&nbsp;point&nbsp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;&nbsp;(abs&nbsp;(t.x&nbsp;-&nbsp;min(p1.x,&nbsp;p2.x))&nbsp;&lt;=&nbsp;eps&nbsp;||&nbsp;min(p1.x,&nbsp;p2.x)&nbsp;&lt;=&nbsp;t.x)&nbsp;&amp;&amp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(abs&nbsp;(max(p1.x,&nbsp;p2.x)&nbsp;-&nbsp;t.x)&nbsp;&lt;=&nbsp;eps&nbsp;||&nbsp;max(p1.x,&nbsp;p2.x)&nbsp;&gt;=&nbsp;t.x)&nbsp;&amp;&amp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(abs&nbsp;(t.y&nbsp;-&nbsp;min(p1.y,&nbsp;p2.y))&nbsp;&lt;=&nbsp;eps&nbsp;||&nbsp;min(p1.y,&nbsp;p2.y)&nbsp;&lt;=&nbsp;t.y)&nbsp;&amp;&amp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(abs&nbsp;(max(p1.y,&nbsp;p2.y)&nbsp;-&nbsp;t.y)&nbsp;&lt;=&nbsp;eps&nbsp;||&nbsp;max(p1.y,&nbsp;p2.y)&nbsp;&gt;=&nbsp;t.y);<br>
+}<br>
+<span id="col7">//&nbsp;наиболее&nbsp;левая&nbsp;из&nbsp;двух&nbsp;точек<br></span>
+point&nbsp;min_px&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;a.x&nbsp;&lt;&nbsp;b.x&nbsp;||&nbsp;(abs&nbsp;(a.x&nbsp;-&nbsp;b.x)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;a.y&nbsp;&lt;&nbsp;b.y)&nbsp;?&nbsp;a&nbsp;:&nbsp;b;<br>
+}<br>
+<span id="col7">//&nbsp;наиболее&nbsp;правая&nbsp;из&nbsp;двух&nbsp;точек<br></span>
+point&nbsp;max_px&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;a.x&nbsp;&gt;&nbsp;b.x&nbsp;||&nbsp;(abs&nbsp;(a.x&nbsp;-&nbsp;b.x)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;a.y&nbsp;&gt;&nbsp;b.y)&nbsp;?&nbsp;a&nbsp;:&nbsp;b;<br>
+}<br>
+<span id="col7">//&nbsp;наиболее&nbsp;низкая&nbsp;из&nbsp;двух&nbsp;точек<br></span>
+point&nbsp;min_py&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;a.y&nbsp;&lt;&nbsp;b.y&nbsp;||&nbsp;(abs&nbsp;(a.y&nbsp;-&nbsp;b.y)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;a.x&nbsp;&lt;&nbsp;b.x)&nbsp;?&nbsp;a&nbsp;:&nbsp;b;<br>
+}<br>
+<span id="col7">//&nbsp;наиболее&nbsp;высокая&nbsp;из&nbsp;двух&nbsp;точек<br></span>
+point&nbsp;max_py&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;a.y&nbsp;&gt;&nbsp;b.y&nbsp;||&nbsp;(abs&nbsp;(a.y&nbsp;-&nbsp;b.y)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;a.x&nbsp;&gt;&nbsp;b.x)&nbsp;?&nbsp;a&nbsp;:&nbsp;b;<br>
+}<br>
+<br>
+<span id="col7">//&nbsp;полярный&nbsp;угол&nbsp;точки<br></span>
+<span id="col6">double</span>&nbsp;polar_angle&nbsp;(point&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;alpha&nbsp;=&nbsp;atan2(p.y,&nbsp;p.x);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(alpha&nbsp;&lt;&nbsp;0)&nbsp;alpha&nbsp;+=&nbsp;2&nbsp;*&nbsp;pi;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;alpha;<br>
+}<br>
+<span id="col7">//&nbsp;полярное&nbsp;расстояние<br></span>
+<span id="col6">double</span>&nbsp;polar_dist&nbsp;(<span id="col6">double</span>&nbsp;alpha,&nbsp;<span id="col6">double</span>&nbsp;r1,&nbsp;<span id="col6">double</span>&nbsp;betta,&nbsp;<span id="col6">double</span>&nbsp;r2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;p1&nbsp;=&nbsp;point&nbsp;(r1&nbsp;*&nbsp;cos&nbsp;(alpha),&nbsp;r1&nbsp;*&nbsp;sin&nbsp;(alpha));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;p2&nbsp;=&nbsp;point&nbsp;(r2&nbsp;*&nbsp;cos&nbsp;(betta),&nbsp;r2&nbsp;*&nbsp;sin&nbsp;(betta));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;dist&nbsp;(p1,&nbsp;p2);<br>
+}<br>
+<span id="col7">//&nbsp;отрезки&nbsp;::&nbsp;деление&nbsp;отрезка&nbsp;в&nbsp;заданном&nbsp;отношении<br></span>
+point&nbsp;part_segment&nbsp;(point&nbsp;p1,&nbsp;point&nbsp;p2,&nbsp;<span id="col6">double</span>&nbsp;m,&nbsp;<span id="col6">double</span>&nbsp;n)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;t;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;t.x&nbsp;=&nbsp;(p1.x&nbsp;*&nbsp;n&nbsp;+&nbsp;p2.x&nbsp;*&nbsp;m)&nbsp;/&nbsp;(m&nbsp;+&nbsp;n);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;t.y&nbsp;=&nbsp;(p1.y&nbsp;*&nbsp;n&nbsp;+&nbsp;p2.y&nbsp;*&nbsp;m)&nbsp;/&nbsp;(m&nbsp;+&nbsp;n);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;t;<br>
+}<br>
+<span id="col7">//&nbsp;поворот&nbsp;точки&nbsp;на&nbsp;заданный&nbsp;угол&nbsp;вокруг&nbsp;начала&nbsp;координат<br></span>
+point&nbsp;turn&nbsp;(point&nbsp;p,&nbsp;<span id="col6">double</span>&nbsp;alpha)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;c&nbsp;=&nbsp;cos(alpha);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;s&nbsp;=&nbsp;sin(alpha);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;point&nbsp;(p.x&nbsp;*&nbsp;c&nbsp;-&nbsp;p.y&nbsp;*&nbsp;s,&nbsp;p.x&nbsp;*&nbsp;s&nbsp;+&nbsp;p.y&nbsp;*&nbsp;c);<br>
+}<br>
+<span id="col7">//&nbsp;поворот&nbsp;точки&nbsp;на&nbsp;заданный&nbsp;угол&nbsp;вокруг&nbsp;заданной&nbsp;точки<br></span>
+point&nbsp;turn_of&nbsp;(point&nbsp;p,&nbsp;<span id="col6">double</span>&nbsp;alpha,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;t&nbsp;=&nbsp;turn&nbsp;(point&nbsp;(p.x&nbsp;-&nbsp;c.x,&nbsp;p.y&nbsp;-&nbsp;c.y),&nbsp;alpha);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;point&nbsp;(t.x&nbsp;+&nbsp;c.x,&nbsp;t.y&nbsp;+&nbsp;c.y);<br>
+}<br>
+<span id="col7">//&nbsp;добавление&nbsp;заданной&nbsp;части&nbsp;вектора&nbsp;к&nbsp;точке<br></span>
+point&nbsp;add_vector&nbsp;(point&nbsp;p,&nbsp;point&nbsp;p1,&nbsp;point&nbsp;p2,&nbsp;<span id="col6">double</span>&nbsp;k)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;point&nbsp;(p.x&nbsp;+&nbsp;(p2.x&nbsp;-&nbsp;p1.x)&nbsp;*&nbsp;k,&nbsp;p.y&nbsp;+&nbsp;(p2.y&nbsp;-&nbsp;p1.y)&nbsp;*&nbsp;k);<br>
+}<br>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//***********************&nbsp;Функции&nbsp;для&nbsp;работы&nbsp;с&nbsp;прямыми&nbsp;************************<br></span>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//&nbsp;уравнение&nbsp;прямой,&nbsp;проходящей&nbsp;через&nbsp;две&nbsp;точки<br></span>
+line&nbsp;toline&nbsp;(point&nbsp;p1,&nbsp;point&nbsp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;a&nbsp;=&nbsp;p2.y&nbsp;-&nbsp;p1.y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;b&nbsp;=&nbsp;p1.x&nbsp;-&nbsp;p2.x;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;line(a,&nbsp;b,&nbsp;-&nbsp;a&nbsp;*&nbsp;p1.x&nbsp;-&nbsp;b&nbsp;*&nbsp;p1.y);<br>
+}<br>
+<span id="col7">//&nbsp;знак&nbsp;точки&nbsp;при&nbsp;подставлении&nbsp;в&nbsp;уравнение&nbsp;прямой<br></span>
+<span id="col6">int</span>&nbsp;point_in_line&nbsp;(line&nbsp;l,&nbsp;point&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;s&nbsp;=&nbsp;l.a&nbsp;*&nbsp;p.x&nbsp;+&nbsp;l.b&nbsp;*&nbsp;p.y&nbsp;+&nbsp;l.c;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;s&nbsp;&lt;&nbsp;-&nbsp;eps&nbsp;?&nbsp;-&nbsp;1&nbsp;:&nbsp;s&nbsp;&gt;&nbsp;eps&nbsp;?&nbsp;1&nbsp;:&nbsp;0;<br>
+}<br>
+<span id="col7">//&nbsp;параллельны&nbsp;ли&nbsp;прямые?<br></span>
+<span id="col6">bool</span>&nbsp;is_parallel_line&nbsp;(line&nbsp;l1,&nbsp;line&nbsp;l2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;abs&nbsp;(l1.a&nbsp;*&nbsp;l2.b&nbsp;-&nbsp;l2.a&nbsp;*&nbsp;l1.b)&nbsp;&lt;=&nbsp;eps;<br>
+}<br>
+<span id="col7">//&nbsp;совпадают&nbsp;ли&nbsp;прямые?<br></span>
+<span id="col6">bool</span>&nbsp;is_equal_line&nbsp;(line&nbsp;l1,&nbsp;line&nbsp;l2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;abs&nbsp;(l1.a&nbsp;*&nbsp;l2.b&nbsp;-&nbsp;l2.a&nbsp;*&nbsp;l1.b)&nbsp;&lt;=&nbsp;eps;&nbsp;&amp;&amp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;abs&nbsp;(l1.a&nbsp;*&nbsp;l2.c&nbsp;-&nbsp;l2.a&nbsp;*&nbsp;l1.c)&nbsp;&lt;=&nbsp;eps;&nbsp;&amp;&amp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;abs&nbsp;(l1.b&nbsp;*&nbsp;l2.c&nbsp;-&nbsp;l2.b&nbsp;*&nbsp;l1.c)&nbsp;&lt;=&nbsp;eps;<br>
+}<br>
+<span id="col7">//&nbsp;пересечение&nbsp;двух&nbsp;прямых<br></span>
+<span id="col6">int</span>&nbsp;cross_line&nbsp;(line&nbsp;l1,&nbsp;line&nbsp;l2,&nbsp;point&nbsp;&amp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(is_equal_line&nbsp;(l1,&nbsp;l2))&nbsp;<span id="col6">return</span>&nbsp;2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(is_parallel_line&nbsp;(l1,&nbsp;l2))&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;p.x&nbsp;=&nbsp;(l2.b&nbsp;*&nbsp;l1.c&nbsp;-&nbsp;l1.b&nbsp;*&nbsp;l2.c)&nbsp;/&nbsp;(l2.a&nbsp;*&nbsp;l1.b&nbsp;-&nbsp;l1.a&nbsp;*&nbsp;l2.b);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;p.y&nbsp;=&nbsp;(l1.b&nbsp;!=&nbsp;0&nbsp;?&nbsp;(-&nbsp;l1.c&nbsp;-&nbsp;l1.a&nbsp;*&nbsp;p.x)&nbsp;/&nbsp;l1.b&nbsp;:&nbsp;(-&nbsp;l2.c&nbsp;-&nbsp;l2.a&nbsp;*&nbsp;p.x)&nbsp;/&nbsp;l2.b);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;1;<br>
+}<br>
+<span id="col7">//&nbsp;перпендикуляр&nbsp;к&nbsp;прямой,&nbsp;проходящий&nbsp;через&nbsp;заданную&nbsp;точку<br></span>
+line&nbsp;perp_line&nbsp;(line&nbsp;l,&nbsp;point&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;line&nbsp;(l.b,&nbsp;-&nbsp;l.a,&nbsp;-&nbsp;l.b&nbsp;*&nbsp;p.x&nbsp;+&nbsp;l.a&nbsp;*&nbsp;p.y);<br>
+}<br>
+<span id="col7">//&nbsp;проекция&nbsp;точки&nbsp;на&nbsp;прямую<br></span>
+point&nbsp;closest_point&nbsp;(line&nbsp;l,&nbsp;point&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;k&nbsp;=&nbsp;(l.a&nbsp;*&nbsp;p.x&nbsp;+&nbsp;l.b&nbsp;*&nbsp;p.y&nbsp;+&nbsp;l.c)&nbsp;/&nbsp;(l.a&nbsp;*&nbsp;l.a&nbsp;+&nbsp;l.b&nbsp;*&nbsp;l.b);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;point&nbsp;(p.x&nbsp;-&nbsp;l.a&nbsp;*&nbsp;k,&nbsp;p.y&nbsp;-&nbsp;l.b&nbsp;*&nbsp;k);<br>
+}<br>
+<span id="col7">//&nbsp;расстояние&nbsp;от&nbsp;точки&nbsp;до&nbsp;прямой<br></span>
+<span id="col6">double</span>&nbsp;dist_point_to_line&nbsp;(point&nbsp;p,&nbsp;line&nbsp;l)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;abs((l.a&nbsp;*&nbsp;p.x&nbsp;+&nbsp;l.b&nbsp;*&nbsp;p.y&nbsp;+&nbsp;l.c)&nbsp;/&nbsp;sqrt(l.a&nbsp;*&nbsp;l.a&nbsp;+&nbsp;l.b&nbsp;*&nbsp;l.b));<br>
+}<br>
+<span id="col7">//&nbsp;прямая&nbsp;параллельная&nbsp;данной&nbsp;и&nbsp;лежащая&nbsp;на&nbsp;расстоянии&nbsp;d&nbsp;от&nbsp;неё<br></span>
+line&nbsp;parallel_line_of_dist&nbsp;(line&nbsp;l,&nbsp;<span id="col6">double</span>&nbsp;d)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;line&nbsp;(l.a,&nbsp;l.b,&nbsp;l.c&nbsp;-&nbsp;d&nbsp;*&nbsp;sqrt&nbsp;(l.a&nbsp;*&nbsp;l.a&nbsp;+&nbsp;l.b&nbsp;*&nbsp;l.b));<br>
+}<br>
+<span id="col7">//&nbsp;расстояние&nbsp;между&nbsp;параллельными&nbsp;прямыми<br></span>
+<span id="col6">double</span>&nbsp;dist_between_line&nbsp;(line&nbsp;l1,&nbsp;line&nbsp;l2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;abs&nbsp;(l1.c&nbsp;-&nbsp;l2.c)&nbsp;/&nbsp;sqrt&nbsp;(l1.a&nbsp;*&nbsp;l1.a&nbsp;+&nbsp;l2.b&nbsp;*&nbsp;l2.b);<br>
+}<br>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//***********************&nbsp;Функции&nbsp;для&nbsp;работы&nbsp;с&nbsp;отрезками&nbsp;**********************<br></span>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//&nbsp;принадлежит&nbsp;ли&nbsp;точка&nbsp;на&nbsp;отрезку?<br></span>
+<span id="col6">bool</span>&nbsp;point_in_segment&nbsp;(point&nbsp;t,&nbsp;point&nbsp;p1,&nbsp;point&nbsp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;a&nbsp;=&nbsp;p2.y&nbsp;-&nbsp;p1.y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;b&nbsp;=&nbsp;p1.x&nbsp;-&nbsp;p2.x;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;c&nbsp;=&nbsp;-&nbsp;a&nbsp;*&nbsp;p1.x&nbsp;-&nbsp;b&nbsp;*&nbsp;p1.y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs(a&nbsp;*&nbsp;t.x&nbsp;+&nbsp;b&nbsp;*&nbsp;t.y&nbsp;+&nbsp;c)&nbsp;&gt;&nbsp;eps)&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;point_in_box&nbsp;(t,&nbsp;p1,&nbsp;p2);<br>
+}<br>
+<br>
+<span id="col7">//&nbsp;пересекаются&nbsp;ли&nbsp;отрезки?<br></span>
+<span id="col6">bool</span>&nbsp;is_cross_segment&nbsp;(point&nbsp;p1,&nbsp;point&nbsp;p2,&nbsp;point&nbsp;p3,&nbsp;point&nbsp;p4)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;l1&nbsp;=&nbsp;toline(p1,&nbsp;p2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;l2&nbsp;=&nbsp;toline(p3,&nbsp;p4);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;sign1&nbsp;=&nbsp;point_in_line(l1,&nbsp;p3)&nbsp;*&nbsp;point_in_line(l1,&nbsp;p4);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;sign2&nbsp;=&nbsp;point_in_line(l2,&nbsp;p1)&nbsp;*&nbsp;point_in_line(l2,&nbsp;p2);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs(sign1)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;abs(sign2)&nbsp;&lt;=&nbsp;eps)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;point_in_box(p1,&nbsp;p3,&nbsp;p4)&nbsp;||&nbsp;point_in_box(p2,&nbsp;p3,&nbsp;p4)&nbsp;||<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;point_in_box(p3,&nbsp;p1,&nbsp;p2)&nbsp;||&nbsp;point_in_box(p4,&nbsp;p1,&nbsp;p2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;sign1&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;sign2&nbsp;&lt;=&nbsp;eps;<br>
+}<br>
+<span id="col7">//&nbsp;пересечение&nbsp;отрезков<br></span>
+<span id="col6">bool</span>&nbsp;cross_segment&nbsp;(point&nbsp;p1,&nbsp;point&nbsp;p2,&nbsp;point&nbsp;p3,&nbsp;point&nbsp;p4,&nbsp;point&nbsp;&amp;t)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Строим&nbsp;прямые&nbsp;проходящие&nbsp;через&nbsp;эти&nbsp;отрезки&nbsp;и&nbsp;пересекаем&nbsp;их<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;l1&nbsp;=&nbsp;toline(p1,&nbsp;p2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;l2&nbsp;=&nbsp;toline(p3,&nbsp;p4);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;cross_line(l1,&nbsp;l2,&nbsp;t);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;0)&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Если&nbsp;прямые&nbsp;совпадают,&nbsp;проверяем&nbsp;каждый&nbsp;конец&nbsp;отрезка&nbsp;на&nbsp;принадлежность&nbsp;другому&nbsp;отрезку<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_box&nbsp;(p1,&nbsp;p3,&nbsp;p4))&nbsp;{&nbsp;t&nbsp;=&nbsp;p1;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">true</span>;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_box&nbsp;(p2,&nbsp;p3,&nbsp;p4))&nbsp;{&nbsp;t&nbsp;=&nbsp;p2;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">true</span>;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_box&nbsp;(p3,&nbsp;p1,&nbsp;p2))&nbsp;{&nbsp;t&nbsp;=&nbsp;p3;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">true</span>;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_box&nbsp;(p4,&nbsp;p1,&nbsp;p2))&nbsp;{&nbsp;t&nbsp;=&nbsp;p4;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">true</span>;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;Если&nbsp;прямые&nbsp;пересекаются,&nbsp;проверяем&nbsp;принадлежит&nbsp;ли&nbsp;точка&nbsp;пересечения&nbsp;обоим&nbsp;отрезкам<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;point_in_box&nbsp;(t,&nbsp;p1,&nbsp;p2)&nbsp;&amp;&amp;&nbsp;point_in_box&nbsp;(t,&nbsp;p3,&nbsp;p4);<br>
+}<br>
+<span id="col7">//&nbsp;расстояние&nbsp;от&nbsp;точки&nbsp;до&nbsp;отрезка<br></span>
+<span id="col6">double</span>&nbsp;dist_point_to_segment&nbsp;(point&nbsp;p,&nbsp;point&nbsp;p1,&nbsp;point&nbsp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;t&nbsp;=&nbsp;closest_point&nbsp;(toline&nbsp;(p1,&nbsp;p2),&nbsp;p);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_box&nbsp;(t,&nbsp;p1,&nbsp;p2))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;dist&nbsp;(p,&nbsp;t);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;min&nbsp;(dist&nbsp;(p,&nbsp;p1),&nbsp;dist&nbsp;(p,&nbsp;p2));<br>
+}<br>
+<br>
+<span id="col7">//&nbsp;пересечение&nbsp;отрезка&nbsp;с&nbsp;прямой<br></span>
+<span id="col6">int</span>&nbsp;cross_segment_line&nbsp;(point&nbsp;p1,&nbsp;point&nbsp;p2,&nbsp;line&nbsp;l,&nbsp;point&nbsp;&amp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;t&nbsp;=&nbsp;toline&nbsp;(p1,&nbsp;p2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;cross_line&nbsp;(l,&nbsp;t,&nbsp;p);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;0)&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;2)&nbsp;<span id="col6">return</span>&nbsp;2;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_box&nbsp;(p,&nbsp;p1,&nbsp;p2))&nbsp;<span id="col6">return</span>&nbsp;1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+}<br>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//***********************&nbsp;Функции&nbsp;для&nbsp;работы&nbsp;с&nbsp;треугольниками&nbsp;*****************<br></span>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//&nbsp;ориентированная&nbsp;площадь&nbsp;треугольника<br></span>
+<span id="col6">double</span>&nbsp;area_triangle&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;0.5&nbsp;*&nbsp;(a.x&nbsp;*&nbsp;b.y&nbsp;+&nbsp;b.x&nbsp;*&nbsp;c.y&nbsp;+&nbsp;c.x&nbsp;*&nbsp;a.y&nbsp;-&nbsp;a.y&nbsp;*&nbsp;b.x&nbsp;-&nbsp;b.y&nbsp;*&nbsp;c.x&nbsp;-&nbsp;c.y&nbsp;*&nbsp;a.x);&nbsp;<br>
+}<br>
+<span id="col7">//&nbsp;угол&nbsp;между&nbsp;тремя&nbsp;точками&nbsp;-&nbsp;через&nbsp;произведение&nbsp;векторов<br></span>
+<span id="col6">double</span>&nbsp;angle_point&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;x1&nbsp;=&nbsp;a.x&nbsp;-&nbsp;b.x,&nbsp;x2&nbsp;=&nbsp;c.x&nbsp;-&nbsp;b.x;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;y1&nbsp;=&nbsp;a.y&nbsp;-&nbsp;b.y,&nbsp;y2&nbsp;=&nbsp;c.y&nbsp;-&nbsp;b.y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;d1&nbsp;=&nbsp;sqrt&nbsp;(x1&nbsp;*&nbsp;x1&nbsp;+&nbsp;y1&nbsp;*&nbsp;y1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;d2&nbsp;=&nbsp;sqrt&nbsp;(x2&nbsp;*&nbsp;x2&nbsp;+&nbsp;y2&nbsp;*&nbsp;y2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;acos&nbsp;((x1&nbsp;*&nbsp;x2&nbsp;+&nbsp;y1&nbsp;*&nbsp;y2)&nbsp;/&nbsp;(d1&nbsp;*&nbsp;d2));<br>
+}<br>
+<span id="col7">//Лежит&nbsp;ли&nbsp;точка&nbsp;справа&nbsp;от&nbsp;отрезка&nbsp;в&nbsp;обходе&nbsp;против&nbsp;часовой&nbsp;стрелки?<br></span>
+<span id="col6">bool</span>&nbsp;ccw&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;area_triangle&nbsp;(a,&nbsp;b,&nbsp;c)&nbsp;&gt;&nbsp;eps;<br>
+}<br>
+<span id="col7">//&nbsp;высота&nbsp;угла<br></span>
+line&nbsp;height_line&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;perp_line&nbsp;(toline&nbsp;(a,&nbsp;c),&nbsp;b);<br>
+}<br>
+<span id="col7">//&nbsp;медиана&nbsp;угла<br></span>
+line&nbsp;median_line&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;toline&nbsp;(b,&nbsp;point&nbsp;((a.x&nbsp;+&nbsp;c.x)&nbsp;/&nbsp;2,&nbsp;(a.y&nbsp;+&nbsp;c.y)&nbsp;/&nbsp;2));<br>
+}<br>
+<span id="col7">//&nbsp;биссектриса&nbsp;угла<br></span>
+line&nbsp;bisector_line&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;ab&nbsp;=&nbsp;dist&nbsp;(a,&nbsp;b);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;bc&nbsp;=&nbsp;dist&nbsp;(b,&nbsp;c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;tab&nbsp;=&nbsp;part_segment&nbsp;(b,&nbsp;a,&nbsp;bc,&nbsp;ab);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;tbc&nbsp;=&nbsp;part_segment&nbsp;(b,&nbsp;c,&nbsp;ab,&nbsp;bc);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;p&nbsp;=&nbsp;part_segment&nbsp;(tab,&nbsp;tbc,&nbsp;1,&nbsp;1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;toline&nbsp;(b,&nbsp;p);<br>
+}<br>
+<span id="col7">//&nbsp;вписанная&nbsp;в&nbsp;треугольник&nbsp;окружность<br></span>
+circle&nbsp;entered_circle&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;ba&nbsp;=&nbsp;bisector_line&nbsp;(b,&nbsp;a,&nbsp;c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;bb&nbsp;=&nbsp;bisector_line&nbsp;(a,&nbsp;b,&nbsp;c);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;circle&nbsp;res;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;cross_line&nbsp;(ba,&nbsp;bb,&nbsp;res.c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;res.r&nbsp;=&nbsp;dist_point_to_line&nbsp;(res.c,&nbsp;toline&nbsp;(a,&nbsp;b));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;res;<br>
+}<br>
+<span id="col7">//&nbsp;описанная&nbsp;около&nbsp;треугольника&nbsp;окружность<br></span>
+circle&nbsp;described_circle&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;tab&nbsp;=&nbsp;part_segment&nbsp;(a,&nbsp;b,&nbsp;1,&nbsp;1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;tbc&nbsp;=&nbsp;part_segment&nbsp;(b,&nbsp;c,&nbsp;1,&nbsp;1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;pab&nbsp;=&nbsp;perp_line&nbsp;(toline&nbsp;(a,&nbsp;b),&nbsp;tab);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;pbc&nbsp;=&nbsp;perp_line&nbsp;(toline&nbsp;(b,&nbsp;c),&nbsp;tbc);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;circle&nbsp;res;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;cross_line&nbsp;(pab,&nbsp;pbc,&nbsp;res.c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;res.r&nbsp;=&nbsp;dist&nbsp;(res.c,&nbsp;a);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;res;<br>
+}<br>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//***********************&nbsp;Функции&nbsp;для&nbsp;работы&nbsp;с&nbsp;окружностями&nbsp;*******************<br></span>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//&nbsp;положение&nbsp;точки&nbsp;относительно&nbsp;окружности<br></span>
+<span id="col6">int</span>&nbsp;point_in_circle&nbsp;(point&nbsp;p,&nbsp;circle&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;d&nbsp;=&nbsp;dist&nbsp;(p,&nbsp;c.c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(c.r&nbsp;-&nbsp;d)&nbsp;&lt;=&nbsp;eps)&nbsp;<span id="col6">return</span>&nbsp;1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(c.r&nbsp;&gt;&nbsp;d)&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;2;<br>
+}<br>
+<span id="col7">//&nbsp;минимальная&nbsp;окружность&nbsp;покрывающая&nbsp;три&nbsp;любые&nbsp;точки<br></span>
+circle&nbsp;min_circle_for_three_point&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b,&nbsp;point&nbsp;c)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;это&nbsp;треугольник,&nbsp;то&nbsp;описываем&nbsp;его<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(area_triangle&nbsp;(a,&nbsp;b,&nbsp;c))&nbsp;&gt;&nbsp;eps)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;described_circle&nbsp;(a,&nbsp;b,&nbsp;c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;иначе&nbsp;это&nbsp;отрезок&nbsp;и&nbsp;точка&nbsp;в&nbsp;нём&nbsp;-&nbsp;из&nbsp;середины&nbsp;проводим&nbsp;окружность&nbsp;диаметром&nbsp;в&nbsp;отрезок<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;maxP&nbsp;=&nbsp;max_px&nbsp;(max_px&nbsp;(a,&nbsp;b),&nbsp;c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;minP&nbsp;=&nbsp;min_px&nbsp;(max_px&nbsp;(a,&nbsp;b),&nbsp;c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;circle&nbsp;(part_segment&nbsp;(maxP,&nbsp;minP,&nbsp;1,&nbsp;1),&nbsp;0.5&nbsp;*&nbsp;dist&nbsp;(minP,&nbsp;maxP));<br>
+}<br>
+<span id="col7">//&nbsp;точки&nbsp;пересечения&nbsp;касательной&nbsp;с&nbsp;окружностью,&nbsp;решение&nbsp;основанное&nbsp;на&nbsp;повороте&nbsp;точек<br></span>
+<span id="col6">int</span>&nbsp;tangent_points&nbsp;(point&nbsp;p,&nbsp;circle&nbsp;c,&nbsp;point&nbsp;&amp;p1,&nbsp;point&nbsp;&amp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;случаи,&nbsp;когда&nbsp;решений&nbsp;меньше&nbsp;двух<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;point_in_circle&nbsp;(p,&nbsp;c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;0)&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p1&nbsp;=&nbsp;p;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;угол&nbsp;между&nbsp;центром&nbsp;окружности&nbsp;и&nbsp;точкой&nbsp;касания<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;d&nbsp;=&nbsp;dist&nbsp;(p,&nbsp;c.c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;alpha&nbsp;=&nbsp;asin&nbsp;(c.r&nbsp;/&nbsp;d);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;поворот&nbsp;центра&nbsp;окружности&nbsp;вокруг&nbsp;заданной&nbsp;точки&nbsp;в&nbsp;обе&nbsp;стороны&nbsp;на&nbsp;заданный&nbsp;угол<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;_p1&nbsp;=&nbsp;turn_of&nbsp;(c.c,&nbsp;alpha,&nbsp;p);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;_p2&nbsp;=&nbsp;turn_of&nbsp;(c.c,&nbsp;-&nbsp;alpha,&nbsp;p);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;расстояние&nbsp;от&nbsp;точки&nbsp;до&nbsp;точки&nbsp;касания&nbsp;и&nbsp;вычисляем&nbsp;точки&nbsp;касания<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;k&nbsp;=&nbsp;sqrt&nbsp;(d&nbsp;*&nbsp;d&nbsp;-&nbsp;c.r&nbsp;*&nbsp;c.r);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;d&nbsp;=&nbsp;dist&nbsp;(p,&nbsp;_p1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;p1&nbsp;=&nbsp;part_segment&nbsp;(p,&nbsp;_p1,&nbsp;k,&nbsp;d&nbsp;-&nbsp;k);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;p2&nbsp;=&nbsp;part_segment&nbsp;(p,&nbsp;_p2,&nbsp;k,&nbsp;d&nbsp;-&nbsp;k);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;2;<br>
+}<br>
+<br>
+<span id="col7">//&nbsp;пересечение&nbsp;прямой&nbsp;с&nbsp;окружностью<br></span>
+<span id="col6">int</span>&nbsp;cross_line_circle&nbsp;(line&nbsp;l,&nbsp;circle&nbsp;c,&nbsp;point&nbsp;&amp;p1,&nbsp;point&nbsp;&amp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;проекция&nbsp;центра&nbsp;окружности&nbsp;на&nbsp;прямую<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;p&nbsp;=&nbsp;closest_point&nbsp;(l,&nbsp;c.c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;сколько&nbsp;всего&nbsp;решений?<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;d&nbsp;=&nbsp;dist&nbsp;(c.c,&nbsp;p);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(d&nbsp;-&nbsp;c.r)&nbsp;&lt;=&nbsp;eps)&nbsp;flag&nbsp;=&nbsp;1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(c.r&nbsp;&gt;&nbsp;d)&nbsp;flag&nbsp;=&nbsp;2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span>&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;находим&nbsp;расстояние&nbsp;от&nbsp;проекции&nbsp;до&nbsp;точек&nbsp;пересечения<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;k&nbsp;=&nbsp;sqrt&nbsp;(c.r&nbsp;*&nbsp;c.r&nbsp;-&nbsp;d&nbsp;*&nbsp;d);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;t&nbsp;=&nbsp;dist&nbsp;(point&nbsp;(0,&nbsp;0),&nbsp;point&nbsp;(l.b,&nbsp;-&nbsp;l.a));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;добавляем&nbsp;к&nbsp;проекции&nbsp;векторы&nbsp;направленные&nbsp;к&nbsp;точкам&nbsp;пеерсечения<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;p1&nbsp;=&nbsp;add_vector&nbsp;(p,&nbsp;point&nbsp;(0,&nbsp;0),&nbsp;point&nbsp;(-&nbsp;l.b,&nbsp;l.a),&nbsp;k&nbsp;/&nbsp;t);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;p2&nbsp;=&nbsp;add_vector&nbsp;(p,&nbsp;point&nbsp;(0,&nbsp;0),&nbsp;point&nbsp;(l.b,&nbsp;-&nbsp;l.a),&nbsp;k&nbsp;/&nbsp;t);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;flag;<br>
+}<br>
+<span id="col7">//&nbsp;пересечение&nbsp;окружностей<br></span>
+<span id="col6">int</span>&nbsp;cross_circle&nbsp;(<span id="col6">double</span>&nbsp;x1,&nbsp;<span id="col6">double</span>&nbsp;y1,&nbsp;<span id="col6">double</span>&nbsp;r1,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;x2,&nbsp;<span id="col6">double</span>&nbsp;y2,&nbsp;<span id="col6">double</span>&nbsp;r2,&nbsp;point&nbsp;&amp;p1,&nbsp;point&nbsp;&amp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(x1&nbsp;-&nbsp;x2)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;abs&nbsp;(y1&nbsp;-&nbsp;y2)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;abs&nbsp;(r1&nbsp;-&nbsp;r2)&nbsp;&lt;=&nbsp;eps)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;3;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;a&nbsp;=&nbsp;2&nbsp;*&nbsp;(x2&nbsp;-&nbsp;x1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;b&nbsp;=&nbsp;2&nbsp;*&nbsp;(y2&nbsp;-&nbsp;y1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;c&nbsp;=&nbsp;x1&nbsp;*&nbsp;x1&nbsp;+&nbsp;y1&nbsp;*&nbsp;y1&nbsp;-&nbsp;r1&nbsp;*&nbsp;r1&nbsp;-&nbsp;(x2&nbsp;*&nbsp;x2&nbsp;+&nbsp;y2&nbsp;*&nbsp;y2&nbsp;-&nbsp;r2&nbsp;*&nbsp;r2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;cross_line_circle&nbsp;(line&nbsp;(a,&nbsp;b,&nbsp;c),&nbsp;circle&nbsp;(x1,&nbsp;y1,&nbsp;r1),&nbsp;p1,&nbsp;p2);<br>
+}<br>
+<span id="col7">//&nbsp;точки&nbsp;касания&nbsp;касательной&nbsp;с&nbsp;окружностью<br></span>
+<span id="col6">int</span>&nbsp;contact_points&nbsp;(point&nbsp;p,&nbsp;circle&nbsp;c,&nbsp;point&nbsp;&amp;p1,&nbsp;point&nbsp;&amp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;point_in_circle&nbsp;(p,&nbsp;c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;0)&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p1&nbsp;=&nbsp;p;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;находим&nbsp;расстояние&nbsp;до&nbsp;точек&nbsp;касания<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;d&nbsp;=&nbsp;dist&nbsp;(p,&nbsp;c.c);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;k&nbsp;=&nbsp;sqrt&nbsp;(d&nbsp;*&nbsp;d&nbsp;-&nbsp;c.r&nbsp;*&nbsp;c.r);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;cross_circle&nbsp;(p.x,&nbsp;p.y,&nbsp;k,&nbsp;c.c.x,&nbsp;c.c.y,&nbsp;c.r,&nbsp;p1,&nbsp;p2);<br>
+}<br>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//***********************&nbsp;Функции&nbsp;для&nbsp;работы&nbsp;с&nbsp;лучами&nbsp;*************************<br></span>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//&nbsp;принадлежит&nbsp;ли&nbsp;точка&nbsp;лучу?<br></span>
+<span id="col6">bool</span>&nbsp;point_in_ray&nbsp;(point&nbsp;p,&nbsp;point&nbsp;p1,&nbsp;point&nbsp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;принадлежит&nbsp;ли&nbsp;точка&nbsp;прямой&nbsp;луча<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;l&nbsp;=&nbsp;toline&nbsp;(p1,&nbsp;p2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_line&nbsp;(l,&nbsp;p)&nbsp;!=&nbsp;0)&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;прямая&nbsp;вертикальная,&nbsp;то&nbsp;проверяем&nbsp;на&nbsp;y<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(l.b)&nbsp;&lt;=&nbsp;eps)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(p2.y&nbsp;&gt;=&nbsp;p1.y)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;p.y&nbsp;&gt;=&nbsp;p1.y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;p.y&nbsp;&lt;=&nbsp;p1.y;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;иначе&nbsp;проверяем&nbsp;на&nbsp;x&nbsp;<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(p2.x&nbsp;&gt;=&nbsp;p1.x)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;p.x&nbsp;&gt;=&nbsp;p1.x;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;p.x&nbsp;&lt;=&nbsp;p1.x;<br>
+}<br>
+<span id="col7">//&nbsp;расстояние&nbsp;от&nbsp;точки&nbsp;до&nbsp;луча<br></span>
+<span id="col6">double</span>&nbsp;dist_point_to_ray&nbsp;(point&nbsp;p,&nbsp;point&nbsp;p1,&nbsp;point&nbsp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;проектируем&nbsp;точку&nbsp;на&nbsp;прямую,&nbsp;проходящую&nbsp;по&nbsp;лучу<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;l&nbsp;=&nbsp;toline&nbsp;(p1,&nbsp;p2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;t&nbsp;=&nbsp;closest_point&nbsp;(l,&nbsp;p);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;полученная&nbsp;точка&nbsp;принадлежит&nbsp;лучу,&nbsp;то&nbsp;возвращаем&nbsp;расстояние&nbsp;до&nbsp;прямой<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_ray&nbsp;(t,&nbsp;p1,&nbsp;p2))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;dist&nbsp;(p,&nbsp;t);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;иначе&nbsp;возвращаем&nbsp;расстояние&nbsp;до&nbsp;начала&nbsp;луча<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;dist&nbsp;(p,&nbsp;p1);<br>
+}<br>
+<span id="col7">//&nbsp;пересение&nbsp;луча&nbsp;с&nbsp;окружностью<br></span>
+<span id="col6">int</span>&nbsp;cross_ray_circle&nbsp;(point&nbsp;p,&nbsp;point&nbsp;t,&nbsp;circle&nbsp;c,&nbsp;point&nbsp;&amp;p1,&nbsp;point&nbsp;&amp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;пересекаем&nbsp;прямую&nbsp;луча&nbsp;с&nbsp;окружностью<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;l&nbsp;=&nbsp;toline&nbsp;(p,&nbsp;t);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;cross_line_circle&nbsp;(l,&nbsp;c,&nbsp;p1,&nbsp;p2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;0)&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;точки&nbsp;пересечения&nbsp;есть,&nbsp;то&nbsp;проверяем&nbsp;их&nbsp;на&nbsp;принадлежность&nbsp;лучу<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;точка&nbsp;одна<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_ray&nbsp;(p1,&nbsp;p,&nbsp;t))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;точки&nbsp;две<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">bool</span>&nbsp;b1&nbsp;=&nbsp;point_in_ray&nbsp;(p1,&nbsp;p,&nbsp;t);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">bool</span>&nbsp;b2&nbsp;=&nbsp;point_in_ray&nbsp;(p2,&nbsp;p,&nbsp;t);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(b1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(b2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(b2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p1&nbsp;=&nbsp;p2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+}<br>
+<span id="col7">//&nbsp;поиск&nbsp;луча&nbsp;с&nbsp;известным&nbsp;началом,&nbsp;который&nbsp;не&nbsp;пересекает&nbsp;ни&nbsp;одну&nbsp;из&nbsp;заданных&nbsp;окружностей<br></span>
+<span id="col6">class</span>&nbsp;less_of_polar_angle<br>
+{<br>
+<span id="col6">public</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">bool</span>&nbsp;operator&nbsp;()&nbsp;(circle&nbsp;c1,&nbsp;circle&nbsp;c2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;c1.alpha&nbsp;&lt;&nbsp;c2.alpha;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+};<br>
+<span id="col6">bool</span>&nbsp;ray_nocross_for_circset&nbsp;(point&nbsp;p,&nbsp;vector&nbsp;&lt;&nbsp;circle&nbsp;&gt;&nbsp;v,&nbsp;point&nbsp;&amp;t)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;n&nbsp;=&nbsp;v.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i,&nbsp;j,&nbsp;k;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;для&nbsp;каждой&nbsp;окружности&nbsp;находим&nbsp;её&nbsp;полярный&nbsp;угол<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v[i].alpha&nbsp;=&nbsp;polar_angle&nbsp;(point&nbsp;(v[i].c.x&nbsp;-&nbsp;p.x,&nbsp;v[i].c.y&nbsp;-&nbsp;p.y));<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;сортируем&nbsp;все&nbsp;окружности&nbsp;по&nbsp;полярному&nbsp;углу&nbsp;одной&nbsp;из&nbsp;точек<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;sort&nbsp;(v.begin&nbsp;(),&nbsp;v.end&nbsp;(),&nbsp;less_of_polar_angle&nbsp;());<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;находим&nbsp;окружность&nbsp;с&nbsp;максимальным&nbsp;радиусом<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;k&nbsp;=&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;1;&nbsp;i&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(v[i].r&nbsp;&gt;&nbsp;v[k].r)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;k&nbsp;=&nbsp;i;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;рассматриваем&nbsp;все&nbsp;окружности&nbsp;по&nbsp;очереди,&nbsp;начиная&nbsp;с&nbsp;k<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;i&nbsp;=&nbsp;k;&nbsp;<span id="col7">//&nbsp;текущая&nbsp;окружность<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;do<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;p1,&nbsp;p2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;contact_points&nbsp;(p,&nbsp;v[i],&nbsp;p1,&nbsp;p2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;alpha&nbsp;=&nbsp;polar_angle&nbsp;(point&nbsp;(p1.x&nbsp;-&nbsp;p.x,&nbsp;p1.y&nbsp;-&nbsp;p.y));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;betta&nbsp;=&nbsp;polar_angle&nbsp;(point&nbsp;(p2.x&nbsp;-&nbsp;p.x,&nbsp;p2.y&nbsp;-&nbsp;p.y));<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;находим&nbsp;левую&nbsp;точку&nbsp;касания&nbsp;-&nbsp;t<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(alpha&nbsp;-&nbsp;betta)&nbsp;&gt;=&nbsp;pi)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(alpha&nbsp;&lt;&nbsp;betta)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&nbsp;p1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&nbsp;p2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(alpha&nbsp;&lt;&nbsp;betta)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&nbsp;p2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&nbsp;p1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;отодвигаем&nbsp;её&nbsp;на&nbsp;0.001&nbsp;по&nbsp;перпендикуляру&nbsp;влево<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;d&nbsp;=&nbsp;0.001&nbsp;/&nbsp;dist&nbsp;(v[i].c,&nbsp;t);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&nbsp;add_vector&nbsp;(t,&nbsp;v[i].c,&nbsp;t,&nbsp;d);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;ищем&nbsp;первую&nbsp;окружность,&nbsp;которая&nbsp;пересекает&nbsp;луч&nbsp;(p,&nbsp;t)<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">bool</span>&nbsp;flag_cross&nbsp;=&nbsp;<span id="col6">false</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j&nbsp;=&nbsp;(i&nbsp;+&nbsp;1)&nbsp;%&nbsp;n;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(cross_ray_circle&nbsp;(p,&nbsp;t,&nbsp;v[j],&nbsp;p1,&nbsp;p2)&nbsp;!=&nbsp;0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;flag_cross&nbsp;=&nbsp;<span id="col6">true</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i&nbsp;=&nbsp;j;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">break</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j&nbsp;=&nbsp;(j&nbsp;+&nbsp;1)&nbsp;%&nbsp;n;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;(j&nbsp;!=&nbsp;k);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;все&nbsp;окружности&nbsp;не&nbsp;пересекают&nbsp;этот&nbsp;луч<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag_cross&nbsp;==&nbsp;<span id="col6">false</span>)&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">true</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;(i&nbsp;!=&nbsp;k);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+}<br>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//***********************&nbsp;Функции&nbsp;для&nbsp;работы&nbsp;с&nbsp;многоугольниками&nbsp;***************<br></span>
+<span id="col7">//-----------------------------------------------------------------------------<br></span>
+<span id="col7">//&nbsp;ориентированная&nbsp;площадь&nbsp;многоугольника<br></span>
+<span id="col6">double</span>&nbsp;area_polygon&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i,&nbsp;j;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;s&nbsp;=&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;p.size();&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j&nbsp;=&nbsp;(i&nbsp;+&nbsp;1)&nbsp;%&nbsp;p.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s&nbsp;+=&nbsp;p[i].x&nbsp;*&nbsp;p[j].y&nbsp;-&nbsp;p[j].x&nbsp;*&nbsp;p[i].y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;0.5&nbsp;*&nbsp;s;<br>
+}<br>
+<br>
+<span id="col7">//&nbsp;периметр&nbsp;многоугольника<br></span>
+<span id="col6">double</span>&nbsp;perimeter_polygon&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i,&nbsp;j;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;perimeter&nbsp;=&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;p.size();&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j&nbsp;=&nbsp;(i&nbsp;+&nbsp;1)&nbsp;%&nbsp;p.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;perimeter&nbsp;+=&nbsp;dist&nbsp;(p[i],&nbsp;p[j]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;perimeter;<br>
+}<br>
+<span id="col7">//&nbsp;принадлежит&nbsp;ли&nbsp;точка&nbsp;в&nbsp;многоугольнику?<br></span>
+<span id="col6">bool</span>&nbsp;point_in_polygon&nbsp;(point&nbsp;t,&nbsp;vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i,&nbsp;j;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;count&nbsp;=&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;p.size();&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j&nbsp;=&nbsp;(i&nbsp;+&nbsp;1)&nbsp;%&nbsp;p.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(min&nbsp;(p[i].y,&nbsp;p[j].y)&nbsp;&lt;&nbsp;t.y&nbsp;&amp;&amp;&nbsp;t.y&nbsp;&lt;=&nbsp;max&nbsp;(p[i].y,&nbsp;p[j].y)&nbsp;&amp;&amp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ccw&nbsp;(min_py&nbsp;(p[i],&nbsp;p[j]),&nbsp;max_py&nbsp;(p[i],&nbsp;p[j]),&nbsp;t))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;проекция&nbsp;точки&nbsp;лежит&nbsp;на&nbsp;отрезке&nbsp;и&nbsp;точка&nbsp;находится&nbsp;справа&nbsp;от&nbsp;отрезка<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;то&nbsp;увеличиваем&nbsp;количество&nbsp;"вхождений"&nbsp;точки&nbsp;в&nbsp;многоугольник<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++&nbsp;count;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;count&nbsp;%&nbsp;2;<br>
+}<br>
+<span id="col7">//&nbsp;количество&nbsp;точек&nbsp;на&nbsp;границе&nbsp;многоугольника<br></span>
+<span id="col6">long</span>&nbsp;<span id="col6">long</span>&nbsp;count_B&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i,&nbsp;j;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">long</span>&nbsp;<span id="col6">long</span>&nbsp;count&nbsp;=&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;p.size();&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j&nbsp;=&nbsp;(i&nbsp;+&nbsp;1)&nbsp;%&nbsp;p.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count&nbsp;+=&nbsp;gcd&nbsp;(p[j].x&nbsp;-&nbsp;p[i].x,&nbsp;p[j].y&nbsp;-&nbsp;p[i].y);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;count;<br>
+}<br>
+<span id="col7">//&nbsp;количество&nbsp;точек&nbsp;внутри&nbsp;многоугольника<br></span>
+<span id="col6">long</span>&nbsp;<span id="col6">long</span>&nbsp;count_I&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;abs&nbsp;(area_polygon&nbsp;(p))&nbsp;-&nbsp;count_B&nbsp;(p)&nbsp;/&nbsp;2&nbsp;+&nbsp;1;<br>
+}<br>
+<span id="col7">//&nbsp;выпуклый&nbsp;ли&nbsp;многоугольник?<br></span>
+<span id="col6">bool</span>&nbsp;is_convex&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;l,&nbsp;i,&nbsp;r;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;n&nbsp;=&nbsp;p.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">bool</span>&nbsp;isccw&nbsp;=&nbsp;ccw&nbsp;(p[n&nbsp;-&nbsp;1],&nbsp;p[0],&nbsp;p[1]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;1;&nbsp;i&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;l&nbsp;=&nbsp;(i&nbsp;-&nbsp;1&nbsp;+&nbsp;n)&nbsp;%&nbsp;n;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;=&nbsp;(i&nbsp;+&nbsp;1)&nbsp;%&nbsp;n;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(ccw&nbsp;(p[l],&nbsp;p[i],&nbsp;p[r])&nbsp;!=&nbsp;isccw)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">true</span>;<br>
+}<br>
+<span id="col7">//&nbsp;выпуклая&nbsp;оболочка&nbsp;-&nbsp;алгоритм&nbsp;Джарвиса<br></span>
+<span id="col6">void</span>&nbsp;hull_jarvis&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p,&nbsp;vector&nbsp;&lt;&nbsp;<span id="col6">int</span>&nbsp;&gt;&nbsp;&amp;ip)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;n&nbsp;=&nbsp;p.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;first,&nbsp;q,&nbsp;next,&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;sign;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;находим&nbsp;самую&nbsp;нижнюю&nbsp;из&nbsp;самых&nbsp;левых&nbsp;точек<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;first&nbsp;=&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;1;&nbsp;i&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(p[i].x&nbsp;&lt;&nbsp;p[first].x&nbsp;||&nbsp;(p[i].x&nbsp;==&nbsp;p[first].x&nbsp;&amp;&amp;&nbsp;p[i].y&nbsp;&lt;&nbsp;p[first].y))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first&nbsp;=&nbsp;i;<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;q&nbsp;=&nbsp;first;&nbsp;<span id="col7">//&nbsp;текущая&nbsp;точка<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;добавляем&nbsp;точки&nbsp;в&nbsp;оболочку<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;do<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ip.push_back(q);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;next&nbsp;=&nbsp;q;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;ищем&nbsp;следующую&nbsp;точку<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;n&nbsp;-&nbsp;1;&nbsp;i&nbsp;&gt;=&nbsp;0;&nbsp;--&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(p[i].x&nbsp;!=&nbsp;p[q].x&nbsp;||&nbsp;p[i].y&nbsp;!=&nbsp;p[q].y)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sign&nbsp;=&nbsp;area_triangle&nbsp;(p[q],&nbsp;p[i],&nbsp;p[next]);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(next&nbsp;==&nbsp;q&nbsp;||&nbsp;sign&nbsp;&gt;&nbsp;0&nbsp;||&nbsp;(sign&nbsp;==&nbsp;0&nbsp;&amp;&amp;&nbsp;point_in_box&nbsp;(p[next],&nbsp;p[q],&nbsp;p[i])))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;next&nbsp;=&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;q&nbsp;=&nbsp;next;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;(q&nbsp;!=&nbsp;first);<br>
+}<br>
+<span id="col7">//&nbsp;выпуклая&nbsp;оболочка&nbsp;-&nbsp;алгоритм&nbsp;Грехема<br></span>
+point&nbsp;first;<br>
+<span id="col6">class</span>&nbsp;less_of_ccw<br>
+{<br>
+<span id="col6">public</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">bool</span>&nbsp;operator&nbsp;()&nbsp;(point&nbsp;a,&nbsp;point&nbsp;b)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(a.i&nbsp;==&nbsp;first.i)&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">true</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(b.i&nbsp;==&nbsp;first.i)&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(ccw&nbsp;(first,&nbsp;a,&nbsp;b))&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">true</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(ccw&nbsp;(first,&nbsp;b,&nbsp;a))&nbsp;<span id="col6">return</span>&nbsp;<span id="col6">false</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;dist&nbsp;(first,&nbsp;a)&nbsp;&gt;&nbsp;dist&nbsp;(first,&nbsp;b);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+};<br>
+<span id="col6">void</span>&nbsp;hull_graham&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p,&nbsp;vector&nbsp;&lt;&nbsp;<span id="col6">int</span>&nbsp;&gt;&nbsp;&amp;ip)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;n&nbsp;=&nbsp;p.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p[i].i&nbsp;=&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;ищем&nbsp;самую&nbsp;нижнюю&nbsp;из&nbsp;самых&nbsp;левых&nbsp;точек&nbsp;-&nbsp;первая&nbsp;точка<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;first&nbsp;=&nbsp;p[0];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;1;&nbsp;i&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(first.x&nbsp;&gt;&nbsp;p[i].x&nbsp;||&nbsp;(first.x&nbsp;==&nbsp;p[i].x&nbsp;&amp;&amp;&nbsp;first.y&nbsp;&gt;&nbsp;p[i].y))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first&nbsp;=&nbsp;p[i];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;сортируем&nbsp;точки&nbsp;по&nbsp;по&nbsp;углу&nbsp;относительно&nbsp;первой&nbsp;точки<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;sort&nbsp;(p.begin&nbsp;(),&nbsp;p.end&nbsp;(),&nbsp;less_of_ccw&nbsp;());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;первая&nbsp;точка&nbsp;оболочки<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;ip.push_back&nbsp;(0);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;ищем&nbsp;вторую&nbsp;точку&nbsp;оболочки<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;1;&nbsp;i&nbsp;&lt;&nbsp;n&nbsp;&amp;&amp;&nbsp;abs&nbsp;(area_triangle&nbsp;(p[0],&nbsp;p[1],&nbsp;p[i]))&nbsp;&lt;=&nbsp;eps;&nbsp;++&nbsp;i);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ip.push_back&nbsp;(1);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;последовательно&nbsp;добавляем&nbsp;точки&nbsp;в&nbsp;оболочку<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;top&nbsp;=&nbsp;1;&nbsp;<span id="col7">//&nbsp;индекс&nbsp;последней&nbsp;точки&nbsp;в&nbsp;оболочке<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;(i&nbsp;&lt;&nbsp;n)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;угол&nbsp;больше&nbsp;pi&nbsp;то&nbsp;извлекаем&nbsp;последнюю&nbsp;точку&nbsp;из&nbsp;оболочки<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(!&nbsp;ccw&nbsp;(p[ip[top&nbsp;-&nbsp;1]],&nbsp;p[ip[top]],&nbsp;p[i]))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;top;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ip.pop_back&nbsp;();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;иначе&nbsp;добавляем&nbsp;точку&nbsp;в&nbsp;оболочку<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++&nbsp;top;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ip.push_back&nbsp;(i);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;ip.size();&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ip[i]&nbsp;=&nbsp;p[ip[i]].i;<br>
+}<br>
+<span id="col7">//&nbsp;минимальная&nbsp;окружность,&nbsp;покрывающая&nbsp;множество&nbsp;точек<br></span>
+circle&nbsp;min_described_circle&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;n&nbsp;=&nbsp;p.size&nbsp;();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i,&nbsp;j,&nbsp;k;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;circle&nbsp;c&nbsp;=&nbsp;circle&nbsp;(0,&nbsp;0,&nbsp;1e9);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(j&nbsp;=&nbsp;i&nbsp;+&nbsp;1;&nbsp;j&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;j)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(k&nbsp;=&nbsp;j&nbsp;+&nbsp;1;&nbsp;k&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;k)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;circle&nbsp;t&nbsp;=&nbsp;min_circle_for_three_point&nbsp;(p[i],&nbsp;p[j],&nbsp;p[k]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;u;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(u&nbsp;=&nbsp;0;&nbsp;u&nbsp;&lt;&nbsp;n;&nbsp;++&nbsp;u)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(point_in_circle&nbsp;(p[u],&nbsp;t)&nbsp;==&nbsp;2)&nbsp;<span id="col6">break</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(u&nbsp;&gt;=&nbsp;n&nbsp;&amp;&amp;&nbsp;t.r&nbsp;&lt;&nbsp;c.r)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;=&nbsp;t;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;c;<br>
+}<br>
+<span id="col7">//&nbsp;расположение&nbsp;многоугольника&nbsp;отосительно&nbsp;прямой<br></span>
+<span id="col7">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;-&nbsp;находится&nbsp;с&nbsp;положительной&nbsp;стороны<br></span>
+<span id="col7">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;1&nbsp;-&nbsp;находится&nbsp;с&nbsp;отрицательной&nbsp;стороны<br></span>
+<span id="col7">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;-&nbsp;прямая&nbsp;пересекает&nbsp;одну&nbsp;из&nbsp;сторон&nbsp;многоугольника&nbsp;(сторону&nbsp;а&nbsp;не&nbsp;вершину)<br></span>
+<span id="col6">int</span>&nbsp;polygon_for_line&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p,&nbsp;line&nbsp;l)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i,&nbsp;j;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;s&nbsp;=&nbsp;-&nbsp;2;&nbsp;<span id="col7">//&nbsp;знак<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;p.size();&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;t&nbsp;=&nbsp;point_in_line&nbsp;(l,&nbsp;p[i]);&nbsp;<span id="col7">//&nbsp;положение&nbsp;вершины&nbsp;относительно&nbsp;прямой<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(t&nbsp;!=&nbsp;0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;точка&nbsp;не&nbsp;принадлежить&nbsp;прямой<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(s&nbsp;!=&nbsp;-&nbsp;2)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;s&nbsp;мы&nbsp;вычислили<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(t&nbsp;!=&nbsp;s)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;знаки&nbsp;различны,&nbsp;то&nbsp;прямая&nbsp;пересекает&nbsp;сторону&nbsp;многоугольника<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s&nbsp;=&nbsp;t;&nbsp;<span id="col7">//&nbsp;если&nbsp;s&nbsp;мы&nbsp;ещё&nbsp;не&nbsp;вычислили,&nbsp;присваиваем&nbsp;ему&nbsp;вычисленное&nbsp;значение<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(s&nbsp;==&nbsp;-&nbsp;2)&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;s;<br>
+}<br>
+<br>
+<span id="col7">//&nbsp;разрезание&nbsp;многоугольника&nbsp;по&nbsp;диагонали<br></span>
+<span id="col6">void</span>&nbsp;cut_polygon_for_edge&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p,&nbsp;<span id="col6">int</span>&nbsp;i1,&nbsp;<span id="col6">int</span>&nbsp;i2,&nbsp;vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;&amp;p1,&nbsp;vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;&amp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;n&nbsp;=&nbsp;p.size();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;i1;&nbsp;i&nbsp;!=&nbsp;(i2&nbsp;+&nbsp;1)&nbsp;%&nbsp;n;&nbsp;i&nbsp;=&nbsp;(i&nbsp;+&nbsp;1)&nbsp;%&nbsp;n)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p1.push_back&nbsp;(p[i]);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;i2;&nbsp;i&nbsp;!=&nbsp;(i1&nbsp;+&nbsp;1)&nbsp;%&nbsp;n;&nbsp;i&nbsp;=&nbsp;(i&nbsp;+&nbsp;1)&nbsp;%&nbsp;n)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p2.push_back&nbsp;(p[i]);<br>
+}<br>
+<span id="col7">//&nbsp;разрезание&nbsp;выпуклого&nbsp;многоугольника&nbsp;по&nbsp;прямой<br></span>
+<span id="col7">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;функция&nbsp;возвращает&nbsp;два&nbsp;многоугольника<br></span>
+<span id="col7">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;первый&nbsp;многоугольник&nbsp;лежит&nbsp;с&nbsp;положительной&nbsp;стороны&nbsp;от&nbsp;прямой<br></span>
+<span id="col7">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;второй&nbsp;-&nbsp;с&nbsp;отрицательной<br></span>
+<span id="col6">void</span>&nbsp;cut_convex_for_line&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;p,&nbsp;line&nbsp;l,&nbsp;vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;&amp;v1,&nbsp;vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;&amp;v2,&nbsp;point&nbsp;&amp;p1,&nbsp;point&nbsp;&amp;p2)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;n&nbsp;=&nbsp;p.size();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i,&nbsp;j;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;находим&nbsp;точки&nbsp;пересечение&nbsp;прямой&nbsp;с&nbsp;многоугольником&nbsp;и&nbsp;вставляем&nbsp;их&nbsp;в&nbsp;многоугольник<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;c&nbsp;=&nbsp;0;&nbsp;<span id="col7">//&nbsp;счётчик&nbsp;пересечений&nbsp;многоугольника&nbsp;с&nbsp;прямой<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;s&nbsp;(p.begin(),&nbsp;p.end());&nbsp;<span id="col7">//&nbsp;представляем&nbsp;многоугольник&nbsp;как&nbsp;список&nbsp;вершин<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;::&nbsp;iterator&nbsp;it,&nbsp;jt;&nbsp;<span id="col7">//&nbsp;итераторы&nbsp;обходы<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;::&nbsp;iterator&nbsp;i1,&nbsp;i2;&nbsp;<span id="col7">//&nbsp;итераторы&nbsp;вставленных&nbsp;точек<br></span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(it&nbsp;=&nbsp;s.begin();&nbsp;it&nbsp;!=&nbsp;s.end();&nbsp;++&nbsp;it)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jt&nbsp;=&nbsp;it;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++&nbsp;jt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(jt&nbsp;==&nbsp;s.end())&nbsp;jt&nbsp;=&nbsp;s.begin();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;пересекаем&nbsp;прямую&nbsp;со&nbsp;стороной<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;point&nbsp;t;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;flag&nbsp;=&nbsp;cross_segment_line&nbsp;(*it,&nbsp;*jt,&nbsp;l,&nbsp;t);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;прямая&nbsp;проходит&nbsp;по&nbsp;стороне<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(polygon_for_line&nbsp;(p,&nbsp;l)&nbsp;&gt;&nbsp;0)&nbsp;&nbsp;&nbsp;&nbsp;v1&nbsp;=&nbsp;p;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span>&nbsp;&nbsp;&nbsp;&nbsp;v2&nbsp;=&nbsp;p;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;прямая&nbsp;и&nbsp;сторона&nbsp;не&nbsp;пересекаются<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(flag&nbsp;==&nbsp;0)&nbsp;<span id="col6">continue</span>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;прямая&nbsp;проходит&nbsp;через&nbsp;вершину&nbsp;многоугольника<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(t.x&nbsp;-&nbsp;(*it).x)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;abs&nbsp;(t.y&nbsp;-&nbsp;(*it).y)&nbsp;&lt;=&nbsp;eps)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(c&nbsp;==&nbsp;0)&nbsp;i1&nbsp;=&nbsp;it;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span>&nbsp;i2&nbsp;=&nbsp;it;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++&nbsp;c;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">continue</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(t.x&nbsp;-&nbsp;(*jt).x)&nbsp;&lt;=&nbsp;eps&nbsp;&amp;&amp;&nbsp;abs&nbsp;(t.y&nbsp;-&nbsp;(*jt).y)&nbsp;&lt;=&nbsp;eps)&nbsp;<span id="col6">continue</span>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;иначе&nbsp;прямая&nbsp;пересекает&nbsp;сторону,&nbsp;вставляем&nbsp;точку&nbsp;пересечения&nbsp;в&nbsp;многоугольник<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++&nbsp;it;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it&nbsp;=&nbsp;s.insert&nbsp;(it,&nbsp;t);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;увеличиваем&nbsp;счётчик&nbsp;пересечений&nbsp;многоугольника&nbsp;с&nbsp;прямой<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(c&nbsp;==&nbsp;0)&nbsp;i1&nbsp;=&nbsp;it;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span>&nbsp;i2&nbsp;=&nbsp;it;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++&nbsp;c;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;прямая&nbsp;не&nbsp;пересекает&nbsp;многоугольник<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(c&nbsp;!=&nbsp;2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(polygon_for_line&nbsp;(p,&nbsp;l)&nbsp;&gt;&nbsp;0)&nbsp;&nbsp;&nbsp;&nbsp;v1&nbsp;=&nbsp;p;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span>&nbsp;&nbsp;&nbsp;&nbsp;v2&nbsp;=&nbsp;p;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;представляем&nbsp;многоугольник&nbsp;массивом&nbsp;точек<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;n&nbsp;=&nbsp;s.size&nbsp;();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;all&nbsp;(s.begin(),&nbsp;s.end());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;j1,&nbsp;j2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(it&nbsp;=&nbsp;s.begin(),&nbsp;i&nbsp;=&nbsp;0;&nbsp;it&nbsp;!=&nbsp;s.end();&nbsp;++&nbsp;i,&nbsp;++&nbsp;it)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(it&nbsp;==&nbsp;i1)&nbsp;j1&nbsp;=&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(it&nbsp;==&nbsp;i2)&nbsp;j2&nbsp;=&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;режем&nbsp;многоугольник<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;p1&nbsp;=&nbsp;all[j1];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;p2&nbsp;=&nbsp;all[j2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cut_polygon_for_edge&nbsp;(all,&nbsp;j1,&nbsp;j2,&nbsp;v1,&nbsp;v2);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col7">//&nbsp;если&nbsp;многоугольники&nbsp;имеют&nbsp;не&nbsp;то&nbsp;расположение&nbsp;которое&nbsp;нам&nbsp;требуется&nbsp;-&nbsp;меняем&nbsp;их&nbsp;местами<br></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(polygon_for_line&nbsp;(v1,&nbsp;l)&nbsp;&lt;&nbsp;0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;swap&nbsp;(v1,&nbsp;v2);<br>
+}<br>
+<br>
+<span id="col7">//&nbsp;разрезание&nbsp;выпуклого&nbsp;многоугольника&nbsp;в&nbsp;отношении&nbsp;площадей&nbsp;m:n<br></span>
+point&nbsp;part_convex&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;v,&nbsp;<span id="col6">double</span>&nbsp;m,&nbsp;<span id="col6">double</span>&nbsp;n)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;area&nbsp;=&nbsp;abs&nbsp;(area_polygon&nbsp;(v))&nbsp;/&nbsp;(m&nbsp;+&nbsp;n)&nbsp;*&nbsp;m;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;a&nbsp;=&nbsp;0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;1;&nbsp;i&nbsp;&lt;&nbsp;v.size&nbsp;()&nbsp;-&nbsp;1;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;s&nbsp;=&nbsp;abs&nbsp;(area_triangle&nbsp;(v[0],&nbsp;v[i],&nbsp;v[i&nbsp;+&nbsp;1]));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(a&nbsp;+&nbsp;s&nbsp;&lt;=&nbsp;area)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;+=&nbsp;s;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">else</span>&nbsp;<span id="col6">break</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">if</span>&nbsp;(abs&nbsp;(a&nbsp;-&nbsp;area)&nbsp;&lt;=&nbsp;eps)&nbsp;<span id="col6">return</span>&nbsp;v[i];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;part_segment&nbsp;(v[i],&nbsp;v[i&nbsp;+&nbsp;1],&nbsp;area&nbsp;-&nbsp;a,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;abs&nbsp;(area_triangle&nbsp;(v[0],&nbsp;v[i],&nbsp;v[i&nbsp;+&nbsp;1])&nbsp;-&nbsp;area&nbsp;+&nbsp;a));<br>
+}<br>
+<span id="col7">//&nbsp;разрезание&nbsp;выпуклого&nbsp;многоугольника&nbsp;на&nbsp;k&nbsp;равных&nbsp;частей<br></span>
+<span id="col6">void</span>&nbsp;npart_convex&nbsp;(vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;v,&nbsp;<span id="col6">int</span>&nbsp;k,&nbsp;vector&nbsp;&lt;&nbsp;point&nbsp;&gt;&nbsp;&amp;s)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;area&nbsp;=&nbsp;abs&nbsp;(area_polygon&nbsp;(v));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">double</span>&nbsp;a&nbsp;=&nbsp;area&nbsp;/&nbsp;(<span id="col6">double</span>)&nbsp;k;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">int</span>&nbsp;i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">for</span>&nbsp;(i&nbsp;=&nbsp;1;&nbsp;i&nbsp;&lt;&nbsp;k;&nbsp;++&nbsp;i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s.push_back&nbsp;(part_convex&nbsp;(v,&nbsp;a&nbsp;*&nbsp;i,&nbsp;area&nbsp;-&nbsp;a&nbsp;*&nbsp;i));<br>
+}<br>
+<span id="col7">//&nbsp;ваша&nbsp;программа&nbsp;:-)<br></span>
+<span id="col6">int</span>&nbsp;main()<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span id="col6">return</span>&nbsp;0;<br>
+}<br>
+</span>
+<br></div>
+<!--************** end ************** -->
+
+<!-- begin of Top100 code -->
+<script id="top100Counter" type="text/javascript" src="http://counter.rambler.ru/top100.jcn?1978219"></script><noscript><img src="http://counter.rambler.ru/top100.cnt?1978219" alt="" width="1" height="1" border="0"/></noscript>
+<!-- end of Top100 code -->
+
+
+<P class="textads">
+Партнёры и спонсоры проекта:  
+<a href="http://www.pfgfx.ru/" target="_blank">MetaTrader, форекс аналитика</a> - здесь!<br>
+<a href="http://www.webservis.ru/" target="_blank">Бесплатный хостинг сайтов, доменов</a> регистрируйтесь.<br>
+Бизнес справочник <a href="http://www.webspravochnik.ru/" target="_blank">www.webspravochnik.ru</a> для вас!
+</p>
+<br><br>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0075)file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/big_integer.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>MAXimal :: algo :: Длинная арифметика</title><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Длинная арифметика_files/style.css" tppabs="http://e-maxx.ru/data/style.css"><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Длинная арифметика_files/geshi.css" tppabs="http://e-maxx.ru/geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--></head><body><table class="main" cellpadding="0" cellspacing="0"><tbody><tr><td class="title" colspan="2"><p>MAXimal</p></td></tr><tr><td class="menu"><ul><li><a href="javascript:if(confirm('http://e-maxx.ru/index.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/index.php'" tppabs="http://e-maxx.ru/index.php">home</a></li><li><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/index.htm" tppabs="http://e-maxx.ru/algo/" class="current">algo</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/wiki/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/wiki/'" tppabs="http://e-maxx.ru/wiki/">wiki</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/bookz/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/bookz/'" tppabs="http://e-maxx.ru/bookz/">bookz</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/forum/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/forum/'" tppabs="http://e-maxx.ru/forum/">forum</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/about.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/about.php'" tppabs="http://e-maxx.ru/about.php">about</a></li></ul></td><td class="content"><p class="algoinfo">прочитано: 6351 раз<br>добавлено: 10 Jun 2008 18:06<br>редактировано: 8 Oct 2009 22:23</p><h1>Длинная арифметика</h1>
+
+<p>Здесь описана работа только с неотрицательными длинными числами.</p>
+<p>Хранить длинные числа будем в виде вектора чисел int, причём каждый элемент вектора содержит не одну, а сразу 9 цифр:</p>
+<pre>const int base = 1000*1000*1000;
+typedef vector&lt;int&gt; lnum;</pre>
+<p>Цифры будут храниться в векторе в таком порядке, что сначала идут наименее значимые цифры.</p>
+<p>Кроме того, все операции будут реализованы таким образом, что после выполнения любой из них лидирующие нули (т.е. лишние нули в начале числа) отсутствуют (разумеется, в предположении, что перед каждой операцией лидирующие нули также отсутствуют).</p>
+<h2>Вывод</h2>
+<p>Самое простое - это вывод длинного числа.</p>
+<p>Сначала мы просто выводим самый последний элемент вектора (или 0, если вектор пустой), а затем выводим все оставшиеся элементы вектора, дополняя их нулями до 9 символов:</p>
+<pre>printf ("%d", a.empty() ? 0 : a.back());
+for (int i=(int)a.size()-2; i&gt;=0; --i)
+	printf ("%09d", a[i]);</pre>
+<p>(здесь тонкий момент: нужно не забыть записать <b>(int)</b>, поскольку в противном случае число a.size() будут беззнаковым, и если a.size()&lt;=1, то при вычитании произойдёт переполнение)</p>
+<h2>Чтение</h2>
+<p>Считываем строку в string, и затем преобразовываем её в вектор:</p>
+<pre>for (int i=(int)s.length(); i&gt;0; i-=9)
+	if (i &lt; 9)
+		a.push_back (atoi (s.substr (0, i).c_str()));
+	else
+		a.push_back (atoi (s.substr (i-9, 9).c_str()));</pre>
+<p>Если использовать вместо string массив char'ов, то код получится ещё компактнее:</p>
+<pre>for (int i=(int)strlen(s); i&gt;0; i-=9) {
+	s[i] = 0;
+	a.push_back (atoi (i&gt;=9 ? s+i-9 : s));
+}</pre>
+<p>Если во входном числе уже могут быть лидирующие нули, то их можно удалить таким образом:</p>
+<pre>while (a.size() &gt; 1 &amp;&amp; a.back() == 0)
+	a.pop_back();</pre>
+<h2>Сложение</h2>
+<p>Прибавляет к числу a число b и сохраняет результат в a:</p>
+<pre>int carry = 0;
+for (size_t i=0; i&lt;max(a.size(),b.size()) || carry; ++i) {
+	if (i == a.size())
+		a.push_back (0);
+	a[i] += carry + (i &lt; b.size() ? b[i] : 0);
+	carry = a[i] &gt;= base;
+	if (carry)  a[i] -= base;
+}</pre>
+<h2>Вычитание</h2>
+<p>Отнимает от числа a число b (a &gt;= b) и сохраняет результат в a:</p>
+<pre>int carry = 0;
+for (size_t i=0; i&lt;b.size() || carry; ++i) {
+	a[i] -= carry + (i &lt; b.size() ? b[i] : 0);
+	carry = a[i] &lt; 0;
+	if (carry)  a[i] += base;
+}
+while (a.size() &gt; 1 &amp;&amp; a.back() == 0)
+	a.pop_back();</pre>
+<h2>Умножение длинного на короткое</h2>
+<p>Умножает длинное a на короткое b (b &lt; base) и сохраняет результат в a:</p>
+<pre>int carry = 0;
+for (size_t i=0; i&lt;a.size() || carry; ++i) {
+	if (i == a.size())
+		a.push_back (0);
+	long long cur = carry + a[i] * 1ll * b;
+	a[i] = int (cur % base);
+	carry = int (cur / base);
+}
+while (a.size() &gt; 1 &amp;&amp; a.back() == 0)
+	a.pop_back();</pre>
+<h2>Умножение двух длинных чисел</h2>
+<p>Умножает a на b и результат сохраняет в c:</p>
+<pre>lnum c (a.size()+b.size());
+for (size_t i=0; i&lt;a.size(); ++i)
+	for (int j=0, carry=0; j&lt;(int)b.size() || carry; ++j) {
+		long long cur = c[i+j] + a[i] * 1ll * (j &lt; (int)b.size() ? b[j] : 0) + carry;
+		c[i+j] = int (cur % base);
+		carry = int (cur / base);
+	}
+while (c.size() &gt; 1 &amp;&amp; c.back() == 0)
+	c.pop_back();</pre>
+<h2>Деление длинного на короткое</h2>
+<p>Делит длинное a на короткое b, частное сохраняет в a, остаток в carry:</p>
+<pre>int carry = 0;
+for (int i=(int)a.size()-1; i&gt;=0; --i) {
+	long long cur = a[i] + carry * 1ll * base;
+	a[i] = int (cur / b);
+	carry = int (cur % b);
+}
+while (a.size() &gt; 1 &amp;&amp; a.back() == 0)
+	a.pop_back();</pre></td></tr></tbody></table><table width="100%"><tbody><tr><td><p style="text-align:center;"><img src="./MAXimal    algo    Длинная арифметика_files/valid-html401-blue.png" tppabs="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height="31" width="88"><img src="./MAXimal    algo    Длинная арифметика_files/valid-css2-blue.png" tppabs="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height="31" width="88"></p></td></tr></tbody></table></body></html>

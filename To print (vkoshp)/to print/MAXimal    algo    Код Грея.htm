@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0073)file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/gray_code.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>MAXimal :: algo :: Код Грея</title><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Код Грея_files/style.css" tppabs="http://e-maxx.ru/data/style.css"><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Код Грея_files/geshi.css" tppabs="http://e-maxx.ru/geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--></head><body><table class="main" cellpadding="0" cellspacing="0"><tbody><tr><td class="title" colspan="2"><p>MAXimal</p></td></tr><tr><td class="menu"><ul><li><a href="javascript:if(confirm('http://e-maxx.ru/index.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/index.php'" tppabs="http://e-maxx.ru/index.php">home</a></li><li><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/index.htm" tppabs="http://e-maxx.ru/algo/" class="current">algo</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/wiki/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/wiki/'" tppabs="http://e-maxx.ru/wiki/">wiki</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/bookz/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/bookz/'" tppabs="http://e-maxx.ru/bookz/">bookz</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/forum/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/forum/'" tppabs="http://e-maxx.ru/forum/">forum</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/about.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/about.php'" tppabs="http://e-maxx.ru/about.php">about</a></li></ul></td><td class="content"><p class="algoinfo">прочитано: 4324 раз<br>добавлено: 10 Jun 2008 18:05<br>редактировано: 5 Jul 2008 21:00</p><h1>Код Грея</h1>
+
+<h2>Определение</h2>
+<p>Кодом Грея называется такая система нумерования неотрицательных чисел, когда коды двух соседних чисел отличаются ровно в одном бите.</p>
+<p>Например, для чисел длины 3 бита имеем такую последовательность кодов Грея: 000, 001, 011, 010, 110, 111, 101, 100. Например, G(4)=6.</p>
+<p>Ясно, что n-битный код Грея соответствует гамильтонову циклу по n-мерному кубу.</p>
+<p>Этот код был изобретен Фрэнком Грэем (Frank Gray) в 1953 году.</p>
+<h2>Нахождение кода Грея</h2>
+<p>Рассмотрим биты числа N и биты числа G(N). Заметим, что i-ый бит G(N) равен единице только в том случае, когда i-ый бит N равен единице, а i+1-ый бит равен нулю, или наоборот (i-ый бит равен нулю, а i+1-ый равен единице). Т.е. Таким образом, имеем: G(N) = N^(N&gt;&gt;1):</p>
+<pre>int g (int n) {
+	return n ^ (n &gt;&gt; 1);
+}</pre>
+<h2>Нахождение обратного кода Грея</h2>
+<p>Требуется по коду Грея G восстановить исходное число N.</p>
+<p>Будем идти от старших битов к младшим (пусть самый младший бит имеет номер 1, а самый старший - K). Получаем:</p>
+<pre>N<sub>K</sub> = G<sub>K</sub>
+N<sub>K-1</sub> = G<sub>K-1</sub>^N<sub>K</sub> = G<sub>K</sub>^G<sub>K-1</sub>
+N<sub>K-2</sub> = G<sub>K-2</sub>^N<sub>K-1</sub> = G<sub>K</sub>^G<sub>K-1</sub>^G<sub>K-2</sub>
+N<sub>K-3</sub> = G<sub>K-3</sub>^N<sub>K-2</sub> = G<sub>K</sub>^G<sub>K-1</sub>^G<sub>K-2</sub>^G<sub>K-3</sub>
+...</pre>
+<p>В виде программного кода это проще всего записать так:</p>
+<pre>int rev_g (int g) {
+	int n = 0;
+	for (; g; g&gt;&gt;=1)
+		n ^= g;
+	return n;
+}</pre>
+<h2>Применения</h2>
+<p>Может показаться неожиданным, но коды Грея имеют сразу несколько применений в различных областях:</p>
+<ul>
+<li>В технике, коды Грея используются для <b>минимизации ошибок</b> при преобразовании аналоговых сигналов в цифровые (например, в датчиках). В частности, коды Грея и были открыты в связи с этим применением.</li>
+<li>Коды Грея применяются в решении задачи о <b>Ханойских башнях</b>.<br>Пусть N - количество дисков. Начнём с кода Грея длины N, состоящего из одних нулей (т.е. G(0)), и будем двигаться по кодам Грея (от G(i) переходить к G(i+1)). Поставим в соответствие каждому I-ому биту текущего кода Грея I-ый диск (причём самому младшему биту соответствует наименьший по размеру диск, а самому старшему биту - наибольший). Поскольку на каждом шаге изменяется ровно один бит, то мы можем понимать изменение бита I как перемещение I-го диска. Заметим, что для всех дисков, кроме наименьшего, на каждом шаге имеется ровно один вариант хода (за исключением стартовой и финальной позиций). Для наименьшего диска всегда имеется два варианта хода, однако имеется стратегия выбора хода, всегда приводящая к ответу: если N нечётно, то последовательность перемещений наименьшего диска имеет вид f-&gt;t-&gt;r-&gt;f-&gt;t-&gt;r-&gt;... (где f-стартовый стержень, t-финальный стержень, r-оставшийся стержень), а если N чётно, то f-&gt;r-&gt;t-&gt;f-&gt;r-&gt;t-&gt;...</li>
+<li>Коды Грея также находят применение в теории <b>генетических алгоритмов</b>.</li></ul></td></tr></tbody></table><table width="100%"><tbody><tr><td><p style="text-align:center;"><img src="./MAXimal    algo    Код Грея_files/valid-html401-blue.png" tppabs="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height="31" width="88"><img src="./MAXimal    algo    Код Грея_files/valid-css2-blue.png" tppabs="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height="31" width="88"></p></td></tr></tbody></table></body></html>

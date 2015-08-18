@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0079)file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/reverse_element.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>MAXimal :: algo :: Обратный элемент в поле по модулю</title><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Обратный элемент в поле по модулю_files/style.css" tppabs="http://e-maxx.ru/data/style.css"><link rel="stylesheet" type="text/css" href="./MAXimal    algo    Обратный элемент в поле по модулю_files/geshi.css" tppabs="http://e-maxx.ru/geshi/geshi.css"><!--[if IE]><style>.menu a, .menu a:hover { width: 100%; }</style><![endif]--></head><body><table class="main" cellpadding="0" cellspacing="0"><tbody><tr><td class="title" colspan="2"><p>MAXimal</p></td></tr><tr><td class="menu"><ul><li><a href="javascript:if(confirm('http://e-maxx.ru/index.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/index.php'" tppabs="http://e-maxx.ru/index.php">home</a></li><li><a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/index.htm" tppabs="http://e-maxx.ru/algo/" class="current">algo</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/wiki/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/wiki/'" tppabs="http://e-maxx.ru/wiki/">wiki</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/bookz/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/bookz/'" tppabs="http://e-maxx.ru/bookz/">bookz</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/forum/  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/forum/'" tppabs="http://e-maxx.ru/forum/">forum</a></li><li><a href="javascript:if(confirm('http://e-maxx.ru/about.php  \n\nThis file was not retrieved by Teleport Pro, because it is addressed on a domain or path outside the boundaries set for its Starting Address.  \n\nDo you want to open it from the server?'))window.location='http://e-maxx.ru/about.php'" tppabs="http://e-maxx.ru/about.php">about</a></li></ul></td><td class="content"><p class="algoinfo">прочитано: 4251 раз<br>добавлено: 10 Jun 2008 18:03<br>редактировано: 11 Jul 2008 10:31</p><h1>Обратный элемент в поле по модулю</h1>
+
+<h2>Определение</h2>
+<p>Если дано поле P по <b>простому</b> модулю m, т.е. состоящее из всех чисел от 0 до m-1, то для любого элемента этого поля можно найти <b>обратный</b> к нему элемент, т.е. удовлетворяющий уравнению:</p>
+<pre>r r<sup>-1</sup> = 1 (mod m)</pre>
+<p>В случае же <b>составного</b> m обратный элемент можно найти для некоторых, но не обязательно всех чисел. А именно, обратный элемент существует только для тех чисел r, которые взаимно просты с m.</p>
+<h2>Нахождение с помощью Расширенного алгоритма Евклида</h2>
+<p>Рассмотрим уравнение:</p>
+<pre>r x + m y = 1</pre>
+<p>Поскольку r и m взаимно просты, то их gcd (r, m) = 1, а потому решение этого уравнения (т.е. пару x и y) можно найти с помощью <a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/extended_euclid_algorithm.htm" tppabs="http://e-maxx.ru/algo/extended_euclid_algorithm">Расширенного алгоритма Евклида</a>.</p>
+<p>С другой стороны, если мы рассмотрим это равенство по модулю m, то получим:</p>
+<pre>r x = 1 (mod m)</pre>
+<p>Т.е. найденное x и будет являться обратным к r элементом.</p>
+<p>Таким образом, код будет примерно таким:</p>
+<pre>int x, y;
+int g = gcdex (r, m, x, y);
+if (g != 1)
+	cout &lt;&lt; "no solution";
+else
+	cout &lt;&lt; x;</pre>
+<h2>Нахождение с помощью Бинарного возведения в степень</h2>
+<p>Воспользуемся <b>теоремой Эйлера</b>:</p>
+<pre>a<sup>&#966;(p)</sup> = 1 (mod p)</pre>
+<p>для взаимно простых a и p ("&#966;" - функция Эйлера, более подробно см. <a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/euler_function.htm" tppabs="http://e-maxx.ru/algo/euler_function">здесь</a>).</p>
+<p>В случае простого p получаем <b>Малую теорему Ферма</b>:</p>
+<pre>a<sup>p-1</sup> = 1 (mod p)</pre>
+<p>Теперь, умножая обе части обоих равенств на a<sup>-1</sup>, получаем:</p>
+<pre>a<sup>&#966;(p)-1</sup> = a<sup>-1</sup> (mod p)</pre>
+<pre>a<sup>p-2</sup> = a<sup>-1</sup> (mod p) для простого p</pre>
+<p>Поскольку возведение в степень можно выполнить за O (log N) (см. <a href="file:///E:/olymp/books/unsorted/e-maxx(MAXimal)/e-maxx(new)/binary_pow.htm" tppabs="http://e-maxx.ru/algo/binary_pow">"Бинарное возведение в степень"</a>), то мы получили сравнительно простой способ нахождения обратного элемента. В случае, когда p - простое или известно значение функции Эйлера, этот способ вычисления несколько проще использования расширенного алгоритма Евклида.</p></td></tr></tbody></table><table width="100%"><tbody><tr><td><p style="text-align:center;"><img src="./MAXimal    algo    Обратный элемент в поле по модулю_files/valid-html401-blue.png" tppabs="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Strict" height="31" width="88"><img src="./MAXimal    algo    Обратный элемент в поле по модулю_files/valid-css2-blue.png" tppabs="http://www.w3.org/Icons/valid-css2-blue" alt="Valid CSS 2.1" height="31" width="88"></p></td></tr></tbody></table></body></html>
