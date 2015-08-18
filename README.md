@@ -1,2 +1,3 @@
 # algolist
-Collection algorithms and data structures in C/C++.
+Collection of algorithms and data structures in C/C++.
+
